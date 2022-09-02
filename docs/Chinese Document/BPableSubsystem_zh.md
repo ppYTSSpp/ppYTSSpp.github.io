@@ -22,7 +22,7 @@ BPable_WorldSubsystem
 
 ## 快速启用
 
-> 这里以BPable_Subsystem为例
+> 这里以BPable_GameInstanceSubsystem为例
 
 - 打开项目的插件设置
 
