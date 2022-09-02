@@ -42,13 +42,32 @@ BPable_WorldSubsystem
 
 ### 游戏实例子系统蓝图类
 
-- 可实现的接口
+- Initialize
+- Deinitialize
+- ShouldCreateSubsystem
+- GetGameInstance
 
 ### 本地玩家子系统蓝图类
 
-- 可实现的接口
+- Initialize
+- Deinitialize
+- ShouldCreateSubsystem
+- GetLocalPlayerController
 
 ### 场景子系统蓝图类
 
-- 可实现的接口
+- Initialize
+
+- PostInitialize
+
+- WorldBeginPlay
+
+- Deinitialize
+
+- ShouldCreateSubsystem
+
 - 当前版本存在问题
+
+  当你创建该子系统的蓝图类时，当退出编辑器时，编辑器会报错并崩溃。
+
+  但正常执行游戏时并不会出现问题（暂时未发现）
