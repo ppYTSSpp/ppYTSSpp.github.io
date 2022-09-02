@@ -50,6 +50,14 @@ BPable_WorldSubsystem
 
 ### 游戏实例子系统蓝图类
 
+|         名称          |                             图示                             |                             解释                             |
+| :-------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
+|      Initialize       | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221009.jpg) |                   此子系统创建后调用的事件                   |
+|     Deinitialize      | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221033.jpg) |               此子系统被GC标记销毁前调用的事件               |
+| ShouldCreateSubsystem | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221053.jpg) | 此子系统创建前调用的函数，用于判断是否要创建该子系统单例。可以不实现，不实现该接口时默认为创建。实现时，若返回值为false则不创建，若返回值为true则创建。请留意 |
+
+
+
 - Initialize
 
   ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221009.jpg)
@@ -66,17 +74,15 @@ BPable_WorldSubsystem
 
   ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221053.jpg)
 
-  此子系统创建前调用的函数，用于判断是否要创建该子系统单例
-
-  可以不实现，不实现该接口时默认为创建
-
-  实现时，若返回值为false则不创建，若返回值为true则创建。请留意
+  此子系统创建前调用的函数，用于判断是否要创建该子系统单例。可以不实现，不实现该接口时默认为创建。实现时，若返回值为false则不创建，若返回值为true则创建。请留意
 
 - GetGameInstance
 
   ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221152.jpg)
 
   获取游戏实例子系统的Outer，即游戏实例UGameInstance
+
+---
 
 ### 本地玩家子系统蓝图类
 
@@ -107,6 +113,8 @@ BPable_WorldSubsystem
   ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 222223.jpg)
 
   通过本子玩家子系统的Outer，即ULocalPlayer，获取ULocalPlayer对应的APlayerController。
+
+---
 
 ### 场景子系统蓝图类
 
