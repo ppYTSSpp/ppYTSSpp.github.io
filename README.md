@@ -1,2 +1,2 @@
 # UE Plugin Documents
-Please visit ppytsspp.github.io for the documentation
+This is [the documentation](https://ppytsspp.github.io/)
