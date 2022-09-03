@@ -48,6 +48,12 @@ BPable_WorldSubsystem
 
 ## 蓝图子系统相关接口
 
+###  使用方法
+
+在蓝图类编辑窗口左侧我的蓝图中点击重载相应的函数
+
+![](../resource/BPableSubsystem/屏幕截图 2022-09-03 130600.jpg)
+
 ### 游戏实例子系统蓝图类
 
 |         名称          |                             图示                             |                             解释                             |
@@ -66,7 +72,7 @@ BPable_WorldSubsystem
 |        Initialize        | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221009.jpg) |                   此子系统创建后调用的事件                   |
 |       Deinitialize       | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221033.jpg) |               此子系统被GC标记销毁前调用的事件               |
 |  ShouldCreateSubsystem   | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221053.jpg) | 此子系统创建前调用的函数，用于判断是否要创建该子系统单例。  可以不实现，不实现该接口时默认为创建。<br>实现时，若返回值为false则不创建，若返回值为true则创建。请留意 |
-| GetLocalPlayerController | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 222223.jpg) | 通过本子玩家子系统的Outer，即ULocalPlayer，获取ULocalPlayer对应的APlayerController。 |
+| GetLocalPlayerController | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 222223.jpg) | 通过本地玩家子系统的Outer，即ULocalPlayer，获取ULocalPlayer对应的APlayerController。 |
 
 ---
 
@@ -82,6 +88,6 @@ BPable_WorldSubsystem
 
 - 当前版本存在问题
 
-  当你创建该子系统的蓝图类时，当退出编辑器时，编辑器会报错并崩溃。
+  如果你创建了场景子系统的蓝图子类时，当退出编辑器时，编辑器会报错并崩溃。 
 
   但正常执行游戏时并不会出现问题（暂时未发现）
