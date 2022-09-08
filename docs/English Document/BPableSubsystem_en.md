@@ -4,6 +4,8 @@ sort: 1
 
 # BlueprintableSubsystem
 
+The corresponding plugin version is v0.5
+
 ## Plugin Profile
 
 This plugin provides three subsystems that can be inherited from blueprints：

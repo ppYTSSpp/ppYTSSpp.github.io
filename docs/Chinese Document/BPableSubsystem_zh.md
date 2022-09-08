@@ -4,6 +4,8 @@ sort: 1
 
 # 可蓝图化的子系统
 
+文档对应插件版本v0.5
+
 ## 插件简介
 
 本插件提供了三个可蓝图继承的子系统：
@@ -85,9 +87,3 @@ BPable_WorldSubsystem
 |    WorldBeginPlay     | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 222658.jpg) | 此当World准备好开始Gameplay、Gamemode转换到正确状态前和调用所有的Actor的Beginplay前调用的事 |
 |     Deinitialize      | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221033.jpg) |               此子系统被GC标记销毁前调用的事件               |
 | ShouldCreateSubsystem | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221053.jpg) | 此子系统创建前调用的函数，用于判断是否要创建该子系统单例。  可以不实现，不实现该接口时默认为创建。<br>实现时，若返回值为false则不创建，若返回值为true则创建。请留意 |
-
-- 当前版本存在问题
-
-  如果你创建了场景子系统的蓝图子类时，当退出编辑器时，编辑器会报错并崩溃。 
-
-  但正常执行游戏时并不会出现问题（暂时未发现）
