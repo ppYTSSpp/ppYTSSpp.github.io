@@ -2,13 +2,11 @@
 sort: 1
 ---
 
-# 可蓝图化的子系统
-
-文档对应插件版本v0.5
+# 可蓝图化的子系统v0.7
 
 ## 插件简介
 
-本插件提供了三个可蓝图继承的子系统：
+本插件提供了四个可蓝图继承的子系统：
 
 BPable_GameInstanceSubsystem
 
@@ -16,11 +14,13 @@ BPable_LocalPlayerSubsystem
 
 BPable_WorldSubsystem
 
+BPable_TickableWorldSubsystem
+
 ![可蓝图继承的子系统](../resource/BPableSubsystem/屏幕截图 2022-09-02 171703.jpg)
 
 > 图中Get到的BPable子系统的这种用法**非法**，关于该插件的使用方法在下文。上图仅仅时展示作用
 
-用户直接通过蓝图继承这三个类就可以获得蓝图子系统。
+用户直接通过蓝图继承这些基类就可以获得蓝图子系统。
 
 ## 快速启用
 
@@ -48,7 +48,7 @@ BPable_WorldSubsystem
 
   ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 220633.jpg)
 
-## 蓝图子系统相关接口
+## 蓝图子系统
 
 ###  使用方法
 
@@ -58,32 +58,94 @@ BPable_WorldSubsystem
 
 ### 游戏实例子系统蓝图类
 
-|         名称          |                             图示                             |                             解释                             |
-| :-------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
-|      Initialize       | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221009.jpg) |                   此子系统创建后调用的事件                   |
-|     Deinitialize      | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221033.jpg) |               此子系统被GC标记销毁前调用的事件               |
-| ShouldCreateSubsystem | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221053.jpg) | 此子系统创建前调用的函数，用于判断是否要创建该子系统单例。  可以不实现，不实现该接口时默认为创建。<br>实现时，若返回值为false则不创建，若返回值为true则创建。请留意 |
-|    GetGameInstance    | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221152.jpg) |      获取游戏实例子系统的Outer，即游戏实例UGameInstance      |
+- 生命周期
+
+  伴随其Outer，即UGameInstance
+
+- 接口
+
+  | 名称                  | 图示                                                         | 解释                                                         |
+  | --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | Initialize            | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221009.jpg) | 此子系统创建后调用的事件                                     |
+  | Deinitialize          | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221033.jpg) | 此子系统被GC标记销毁前调用的事件                             |
+  | ShouldCreateSubsystem | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221053.jpg) | 此子系统创建前调用的函数，用于判断是否要创建该子系统单例。  可以不实现，不实现该接口时默认为创建。<br>实现函数后，若返回值为false则不创建，若返回值为true则创建。请留意 |
+
+- 函数
+
+  | 名称            | 图示                                                         | 解释                                                   |
+  | --------------- | ------------------------------------------------------------ | ------------------------------------------------------ |
+  | GetGameInstance | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221152.jpg) | 获取游戏实例子系统的Outer，即游戏实例UGameInstance对象 |
+
+  
 
 ---
 
 ### 本地玩家子系统蓝图类
 
-|           名称           |                             图示                             |                             解释                             |
-| :----------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
-|        Initialize        | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221009.jpg) |                   此子系统创建后调用的事件                   |
-|       Deinitialize       | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221033.jpg) |               此子系统被GC标记销毁前调用的事件               |
-|  ShouldCreateSubsystem   | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221053.jpg) | 此子系统创建前调用的函数，用于判断是否要创建该子系统单例。  可以不实现，不实现该接口时默认为创建。<br>实现时，若返回值为false则不创建，若返回值为true则创建。请留意 |
-| GetLocalPlayerController | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 222223.jpg) | 通过本地玩家子系统的Outer，即ULocalPlayer，获取ULocalPlayer对应的APlayerController。 |
+- 生命周期
+
+  伴随其Outer，即ULocalPlayer。
+
+- 接口
+
+  | 名称                  | 图示                                                         | 解释                                                         |
+  | --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | Initialize            | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221009.jpg) | 此子系统创建后调用的事件                                     |
+  | Deinitialize          | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221033.jpg) | 此子系统被GC标记销毁前调用的事件                             |
+  | ShouldCreateSubsystem | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221053.jpg) | 此子系统创建前调用的函数，用于判断是否要创建该子系统单例。  可以不实现，不实现该接口时默认为创建。<br>实现时，若返回值为false则不创建，若返回值为true则创建。请留意 |
+
+- 函数
+
+  | 名称                     | 图示                                                         | 解释                                                         |
+  | ------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | GetLocalPlayerController | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 222223.jpg) | 通过本地玩家子系统的Outer，即ULocalPlayer，获取ULocalPlayer对应的APlayerController。<br>执行Initialize时，这个节点返回值为null |
 
 ---
 
 ### 场景子系统蓝图类
 
-|         名称          |                             图示                             |                             解释                             |
-| :-------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
-|      Initialize       | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221009.jpg) |                   此子系统创建后调用的事件                   |
-|    PostInitialize     | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 222639.jpg) |       此所有UWorldSubsystem调用Initialize后调用的事件        |
-|    WorldBeginPlay     | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 222658.jpg) | 此当World准备好开始Gameplay、Gamemode转换到正确状态前和调用所有的Actor的Beginplay前调用的事 |
-|     Deinitialize      | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221033.jpg) |               此子系统被GC标记销毁前调用的事件               |
-| ShouldCreateSubsystem | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221053.jpg) | 此子系统创建前调用的函数，用于判断是否要创建该子系统单例。  可以不实现，不实现该接口时默认为创建。<br>实现时，若返回值为false则不创建，若返回值为true则创建。请留意 |
+- 生命周期
+
+  伴随其Outer，即UWorld。仅在Game或PIE中生成
+
+- 接口
+
+  | 名称                  | 图示                                                         | 解释                                                         |
+  | --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | Initialize            | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221009.jpg) | 此子系统创建后调用的事件                                     |
+  | PostInitialize        | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 222639.jpg) | 此所有UWorldSubsystem调用Initialize后调用的事件              |
+  | WorldBeginPlay        | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 222658.jpg) | 此当World准备好开始Gameplay、Gamemode转换到正确状态前和调用所有的Actor的Beginplay前调用的事 |
+  | Deinitialize          | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221033.jpg) | 此子系统被GC标记销毁前调用的事件                             |
+  | ShouldCreateSubsystem | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221053.jpg) | 此子系统创建前调用的函数，用于判断是否要创建该子系统单例。  可以不实现，不实现该接口时默认为创建。<br>实现时，若返回值为false则不创建，若返回值为true则创建。请留意 |
+
+------
+
+### 可Tick的场景蓝图子系统蓝图类
+
+- 生命周期
+
+  继承自UBPable_WorldSubsystem，请在父类中查看相关内容
+
+- 类默认值
+
+  | 名称                 | 解释                     |
+  | -------------------- | ------------------------ |
+  | IsTickEnabled        | 是否启用Tick             |
+  | IsTickableThenPaused | 是否在游戏暂停后启用Tick |
+
+- 接口
+
+  部分接口继承自UBPable_WorldSubsystem，请在父类中查看相关内容
+
+  | 名称 | 图示                                                         | 解释                       |
+  | ---- | ------------------------------------------------------------ | -------------------------- |
+  | Tick | ![](../resource/BPableSubsystem/屏幕截图 2022-09-09 184318.jpg) | 启用了Tick后每帧调用的时间 |
+
+- 函数
+
+  | 名称                          | 图示                                                         | 解释                         |
+  | ----------------------------- | ------------------------------------------------------------ | ---------------------------- |
+  | SetTickEnabled                | ![](../resource/BPableSubsystem/屏幕截图 2022-09-09 220828.jpg) | 设置是否启用Tick             |
+  | IsSubsystemTickEnabled        | ![](../resource/BPableSubsystem/屏幕截图 2022-09-09 220740.jpg) | 返回Tick启用的值             |
+  | SetTickableWhenPaused         | ![](../resource/BPableSubsystem/屏幕截图 2022-09-09 220732.jpg) | 设置是否当游戏暂停时Tick     |
+  | IsSubsystemTickableWhenPaused | ![](../resource/BPableSubsystem/屏幕截图 2022-09-09 220748.jpg) | 返回是否在游戏暂停时Tick的值 |
