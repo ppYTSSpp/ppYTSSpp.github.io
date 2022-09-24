@@ -2,17 +2,21 @@
 sort: 1
 ---
 
-# 可蓝图化的子系统v0.7
+# 可蓝图化的子系统v0.8
 
 ## 插件简介
 
-本插件提供了四个可蓝图继承的子系统：
+本插件提供了六个可蓝图继承的子系统：
 
 BPable_GameInstanceSubsystem
 
 BPable_LocalPlayerSubsystem
 
 BPable_WorldSubsystem
+
+BPable_TickableGameInstanceSubsystem
+
+BPable_TickableLocalPlayerSubsystem
 
 BPable_TickableWorldSubsystem
 
@@ -50,11 +54,17 @@ BPable_TickableWorldSubsystem
 
 ## 蓝图子系统
 
-###  使用方法
+###  通用使用说明
 
 在蓝图类编辑窗口左侧我的蓝图中点击重载相应的函数
 
 ![](../resource/BPableSubsystem/屏幕截图 2022-09-03 130600.jpg)
+
+请勿在 事件Initialize 和 事件Deinitialize 中使用需要提前知道World的节点（如GetActorOfClass、Delay）。
+
+​	原因：Subsystem的 事件Initialize 和 事件Deinitialize 被执行时World尚未准备好或者在卸载中，所以此时执行诸如GetActorOfClass或Delay节点是无效的。
+
+​	建议：在除了  事件Initialize 和 事件Deinitialize 之外的其他事件中使用这类节点，诸如WorldBeginPlay、Tick或者自定义事件
 
 ### 游戏实例子系统蓝图类
 
@@ -67,6 +77,8 @@ BPable_TickableWorldSubsystem
   | 名称                  | 图示                                                         | 解释                                                         |
   | --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
   | Initialize            | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221009.jpg) | 此子系统创建后调用的事件                                     |
+  | WorldBeginPlay        | ![](../resource/BPableSubsystem/屏幕截图 2022-09-24 202344.jpg) | 此World开始执行BeginPlay时调用的事件                         |
+  | WorldBeginTearDown    | ![](../resource/BPableSubsystem/屏幕截图 2022-09-24 202410.jpg) | 此World开始执行TearDown时调用的事件                          |
   | Deinitialize          | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221033.jpg) | 此子系统被GC标记销毁前调用的事件                             |
   | ShouldCreateSubsystem | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221053.jpg) | 此子系统创建前调用的函数，用于判断是否要创建该子系统单例。  可以不实现，不实现该接口时默认为创建。<br>实现函数后，若返回值为false则不创建，若返回值为true则创建。请留意 |
 
@@ -91,6 +103,8 @@ BPable_TickableWorldSubsystem
   | 名称                  | 图示                                                         | 解释                                                         |
   | --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
   | Initialize            | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221009.jpg) | 此子系统创建后调用的事件                                     |
+  | WorldBeginPlay        | ![](../resource/BPableSubsystem/屏幕截图 2022-09-24 202344.jpg) | 此World开始执行BeginPlay时调用的事件                         |
+  | WorldBeginTearDown    | ![](../resource/BPableSubsystem/屏幕截图 2022-09-24 202410.jpg) | 此World开始执行TearDown时调用的事件                          |
   | Deinitialize          | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221033.jpg) | 此子系统被GC标记销毁前调用的事件                             |
   | ShouldCreateSubsystem | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221053.jpg) | 此子系统创建前调用的函数，用于判断是否要创建该子系统单例。  可以不实现，不实现该接口时默认为创建。<br>实现时，若返回值为false则不创建，若返回值为true则创建。请留意 |
 
@@ -120,11 +134,11 @@ BPable_TickableWorldSubsystem
 
 ------
 
-### 可Tick的场景蓝图子系统蓝图类
+### 可Tick的游戏实例子系统蓝图类
 
 - 生命周期
 
-  继承自UBPable_WorldSubsystem，请在父类中查看相关内容
+  继承自UBPable_GameInstanceSubsystem，请在父类中查看相关内容
 
 - 类默认值
 
@@ -135,7 +149,7 @@ BPable_TickableWorldSubsystem
 
 - 接口
 
-  部分接口继承自UBPable_WorldSubsystem，请在父类中查看相关内容
+  部分接口继承自UBPable_GameInstanceSubsystem，请在父类中查看相关内容
 
   | 名称 | 图示                                                         | 解释                       |
   | ---- | ------------------------------------------------------------ | -------------------------- |
@@ -143,9 +157,55 @@ BPable_TickableWorldSubsystem
 
 - 函数
 
+  部分函数继承自UBPable_GameInstanceSubsystem，请在父类中查看相关内容
+
   | 名称                          | 图示                                                         | 解释                         |
   | ----------------------------- | ------------------------------------------------------------ | ---------------------------- |
-  | SetTickEnabled                | ![](../resource/BPableSubsystem/屏幕截图 2022-09-09 220828.jpg) | 设置是否启用Tick             |
-  | IsSubsystemTickEnabled        | ![](../resource/BPableSubsystem/屏幕截图 2022-09-09 220740.jpg) | 返回Tick启用的值             |
-  | SetTickableWhenPaused         | ![](../resource/BPableSubsystem/屏幕截图 2022-09-09 220732.jpg) | 设置是否当游戏暂停时Tick     |
-  | IsSubsystemTickableWhenPaused | ![](../resource/BPableSubsystem/屏幕截图 2022-09-09 220748.jpg) | 返回是否在游戏暂停时Tick的值 |
+  | SetTickEnabled                | ![](../resource/BPableSubsystem/屏幕截图 2022-09-24 203609.jpg) | 设置是否启用Tick             |
+  | IsSubsystemTickEnabled        | ![](../resource/BPableSubsystem/屏幕截图 2022-09-24 203620.jpg) | 返回Tick启用的值             |
+  | SetTickableWhenPaused         | ![](../resource/BPableSubsystem/屏幕截图 2022-09-24 203630.jpg) | 设置是否当游戏暂停时Tick     |
+  | IsSubsystemTickableWhenPaused | ![](../resource/BPableSubsystem/屏幕截图 2022-09-24 203639.jpg) | 返回是否在游戏暂停时Tick的值 |
+
+### 可Tick的本地玩家子系统蓝图类
+
+- 生命周期
+
+  继承自UBPable_LocalPlayerSubsystem，请在父类中查看相关内容
+
+- 类默认值
+
+  Tick相关的类默认值和UBPable_TickableLocalPlayerSubsystem保持一致，请前往查看
+
+- 接口
+
+  部分接口继承自UBPable_LocalPlayerSubsystem，请在父类中查看相关内容
+
+  Tick相关的事件和UBPable_TickableLocalPlayerSubsystem保持一致，请前往查看
+
+- 函数
+
+  部分函数继承自UBPable_LocalPlayerSubsystem，请在父类中查看相关内容
+
+  Tick相关的函数和UBPable_TickableLocalPlayerSubsystem保持一致，请前往查看
+
+---
+
+### 可Tick的场景子系统蓝图类
+
+- 生命周期
+
+  继承自UBPable_WorldSubsystem，请在父类中查看相关内容
+
+- 类默认值
+
+  Tick相关的类默认值和UBPable_TickableGameInstanceSubsystem保持一致，请前往查看
+  
+- 接口
+
+  部分接口继承自UBPable_WorldSubsystem，请在父类中查看相关内容
+
+  Tick相关的事件和UBPable_TickableGameInstanceSubsystem保持一致，请前往查看
+  
+- 函数
+
+  Tick相关的函数和UBPable_TickableGameInstanceSubsystem保持一致，请前往查看
