@@ -56,11 +56,19 @@ Users can obtain the blueprint subsystem by inheriting these base classes direct
 
 ## About BlueprintableSubsystem
 
-###  Usage
+###  General Usage
 
 In my Blueprint on the left side of the Blueprint class edit window click to override the corresponding function
 
 ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103541.jpg)
+
+
+
+Do not use a node whose World must be known in advance (such as GetActorOfClass and Delay) in Event Initialize and  Deinitialize.
+
+​	Reason: Subsystem's event Initialize and event Deinitialize are executed when World is not ready or is uninstalled, so executing nodes such as GetActorOfClass or Delay is not effective at this time.
+
+​	Suggestion: Use this type of node for events other than event Initialize and event Deinitialize, such as WorldBeginPlay, Tick, or custom events
 
 ### BPable_GameInstanceSubsystem
 
@@ -172,19 +180,19 @@ In my Blueprint on the left side of the Blueprint class edit window click to ove
 
 - Class defaults
 
-  Tick相关的类默认值和UBPable_TickableLocalPlayerSubsystem保持一致，请前往查看
+  Tick the relevant class default values and UBPable_TickableLocalPlayerSubsystem consistent, please to view
 
 - Interface
 
   Some interfaces are Inherited from UBPable_LocalPlayerSubsystem. Please view relevant contents in the parent class.
 
-  Tick相关的事件和UBPable_TickableLocalPlayerSubsystem保持一致，请前往查看
+  Tick the relevant events and UBPable_TickableLocalPlayerSubsystem consistent, please to view
 
 - Function
 
   Some functions are Inherited from UBPable_LocalPlayerSubsystem. Please view relevant contents in the parent class.
 
-  Tick相关的函数和UBPable_TickableLocalPlayerSubsystem保持一致，请前往查看
+  Tick the relevant function and UBPable_TickableLocalPlayerSubsystem consistent, please to view
 
 ### BPable_TickableWorldSubsystem
 
@@ -194,14 +202,14 @@ In my Blueprint on the left side of the Blueprint class edit window click to ove
 
 - Class defaults
 
-  Tick相关的类默认值和BPable_TickableWorldSubsystem保持一致，请前往查看
+  The default value of Tick related class is the same as BPable_TickableWorldSubsystem, please go to check
 
 - Interface
 
   Some interfaces are Inherited from UBPable_WorldSubsystem. Please view relevant contents in the parent class.
 
-  Tick相关的事件和BPable_TickableWorldSubsystem保持一致，请前往查看
+  Tick related events are consistent with BPable_TickableWorldSubsystem, please go to check
 
 - Function
 
-  Tick相关的函数和BPable_TickableWorldSubsystem保持一致，请前往查看
+  Tick related functions are the same as BPable_TickableWorldSubsystem, please go to see
