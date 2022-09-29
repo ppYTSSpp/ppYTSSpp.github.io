@@ -2,7 +2,7 @@
 sort: 1
 ---
 
-# BlueprintableSubsystem v0.7
+# BlueprintableSubsystem v0.8
 
 - Translated by lpl
 
