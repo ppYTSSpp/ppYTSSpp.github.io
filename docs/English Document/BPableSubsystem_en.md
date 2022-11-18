@@ -2,29 +2,33 @@
 sort: 1
 ---
 
-# BlueprintableSubsystem v0.8
+# BlueprintableSubsystem v1.3
 
-- Translated by lpl
+- Partially translated by lpl
 
 ## The Profile of Plugin
 
 This plugin provides six subsystems that can be inherited from blueprints：
 
-BPable_GameInstanceSubsystem
+- BPable_GameInstanceSubsystem
 
-BPable_LocalPlayerSubsystem
+- BPable_LocalPlayerSubsystem
 
-BPable_WorldSubsystem
+- BPable_WorldSubsystem
 
-BPable_TickableGameInstanceSubsystem
+- BPable_TickableGameInstanceSubsystem
 
-BPable_TickableLocalPlayerSubsystem
+- BPable_TickableLocalPlayerSubsystem
 
-BPable_TickableWorldSubsystem
+- BPable_TickableWorldSubsystem
 
 ![可蓝图继承的子系统](../resource/BPableSubsystem/屏幕截图 2022-09-02 171703.jpg)
 
-> This method of using  the BPable subsystem that you get in this figure is **illegal**, the proper usage of this plugin is explained down below. The picture above is only for demonstration
+> This usage of the Get to BPable subsystem in the figure is **illegal**. Because these Subsystems in the figure are the base classes provided by the plugin, they should not be acquired under any circumstances.
+>
+> Of course, it is OK to get your subsystem blueprint class in the way in the figure.
+>
+> About the use of the plugin is below. The above diagram only shows the role
 
 Users can obtain the blueprint subsystem by inheriting these base classes directly from the blueprint.
 
@@ -76,7 +80,7 @@ Do not use a node whose World must be known in advance (such as GetActorOfClass 
 
   Follow its' Outer,which is also called UGameInstance.
 
-- Interface
+- Events
 
   | Name                  | Graphic                                                      | Explain                                                      |
   | --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -86,7 +90,7 @@ Do not use a node whose World must be known in advance (such as GetActorOfClass 
   | Deinitialize          | ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103627.jpg) | A event called before this subsystem was destoryed           |
   | ShouldCreateSubsystem | ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103638.jpg) | A function called before this subsystem created<br/> the Implementation of it is not necessary<br/>If implement this function,return true to create this subsystem,return false not to create this subsystem |
 
-- Function
+- Functions
 
   | Name            | Graphic                                                      | Explain                                                      |
   | --------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -102,7 +106,7 @@ Do not use a node whose World must be known in advance (such as GetActorOfClass 
 
   Follow its' Outer,which is also called ULocalPlayer.
 
-- Interface
+- Events
 
   | Name                  | Graphic                                                      | Explain                                                      |
   | --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -112,7 +116,7 @@ Do not use a node whose World must be known in advance (such as GetActorOfClass 
   | Deinitialize          | ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103627.jpg) | A event called before this subsystem was destoryed           |
   | ShouldCreateSubsystem | ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103638.jpg) | A function called before this subsystem created<br/> the Implementation of it is not necessary<br/>If implement this function,return true to create this subsystem,return false not to create this subsystem |
 
-- Function
+- Functions
 
   | Name                     | Graphic                                                      | Explain                                                      |
   | ------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -126,7 +130,7 @@ Do not use a node whose World must be known in advance (such as GetActorOfClass 
 
   Following its' Outer，which is also called UWorld.Only appear in Game or PIE.
 
-- Interface
+- Events
 
   | Name                  | Graphic                                                      | Explain                                                      |
   | --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -138,13 +142,53 @@ Do not use a node whose World must be known in advance (such as GetActorOfClass 
 
 ------
 
+## General Functions
+
+### Subsystem blueprint class with active state
+
+- Function Overview
+
+  An independent activation state that does not materially affect the Subsystem itself, providing a boolean state to the user
+
+- Applicable Base Classes
+
+  Subclasses of a base class whose class name is prefixed with "BPable"
+
+- Class defaults
+
+  | Name          | Explain                   |
+  | ------------- | ------------------------- |
+  | ActiveDefault | Default activation status |
+
+- Functions
+
+  | Name         | Graphic                                                      | Explain                                                      |
+  | ------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | IsActive     | ![](../resource/BPableSubsystem/屏幕截图 2022-11-18 131643.jpg) | Get the activation status value                              |
+  | Activate     | ![](../resource/BPableSubsystem/屏幕截图 2022-11-18 131652.jpg) | Activate and broadcast activation<br />When the parameter bReset is true, it will still be activated again even if it is already active. |
+  | Deactivate   | ![](../resource/BPableSubsystem/屏幕截图 2022-11-18 131703.jpg) | Deactivate                                                   |
+  | ToggleActive | ![](../resource/BPableSubsystem/屏幕截图 2022-11-18 131719.jpg) | Toggle activation                                            |
+  | SetActive    | ![](../resource/BPableSubsystem/屏幕截图 2022-11-18 131732.jpg) | Sets the activation status. <br />The parameter NewActive is the new value to be set.<br />The parameter Reset is whether to reset the activation |
+
+- Delegates
+
+  | 名称                      | 解释                                                         |
+  | ------------------------- | ------------------------------------------------------------ |
+  | OnActivated(Object,Reset) | The delegate executed after activation<br /> The parameter Object is a reference to the Subsystem that distributes the delegate<br /> The parameter Reset is whether the activation is reset on activation |
+  | OnDeactivated(Object)     | The delegate executed after the inactivation<br /> parameter Object is a reference to the Subsystem that distributes the delegate |
 
 
-### BPable_TickableGameInstanceSubsystem
+---
 
-- Life Time
+### Tickable subsystem blueprint classes
 
-  Inherited from UBPable_GameInstanceSubsystem. Please view relevant contents in the parent class.
+- Function Overview
+
+  With this feature subsystem blueprint classes can execute Tick events with each frame
+
+- Applicable Base Classes
+
+  Subclasses of a base class whose class name is prefixed with "BPable_Tickable"
 
 - Class defaults
 
@@ -153,7 +197,7 @@ Do not use a node whose World must be known in advance (such as GetActorOfClass 
   | IsTickEnabled        | Whether to enable Tick                          |
   | IsTickableThenPaused | Whether to enable Tick after the game is paused |
 
-- Interface
+- Event
 
   Some interfaces are Inherited from UBPable_GameInstanceSubsystem. Please view relevant contents in the parent class.
 
@@ -161,7 +205,7 @@ Do not use a node whose World must be known in advance (such as GetActorOfClass 
   | ---- | ------------------------------------------------------------ | ------------------------------------------------------ |
   | Tick | ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103926.jpg) | This event is called every frame after Tick is enabled |
 
-- Function
+- Functions
 
   Some functions are Inherited from UBPable_GameInstanceSubsystem.Please view relevant contents in the parent class.
 
@@ -171,45 +215,3 @@ Do not use a node whose World must be known in advance (such as GetActorOfClass 
   | IsSubsystemTickEnabled        | ![](../resource/BPableSubsystem/屏幕截图 2022-09-24 212410.jpg) | The enabled value   when return to tick                 |
   | SetTickableWhenPaused         | ![](../resource/BPableSubsystem/屏幕截图 2022-09-24 212419.jpg) | Set whether to tick when the game pause                 |
   | IsSubsystemTickableWhenPaused | ![](../resource/BPableSubsystem/屏幕截图 2022-09-24 212428.jpg) | Report a value that wherher to tick when the game pause |
-
-### BPable_TickableLocalPlayerSubsystem
-
-- Life Time
-
-  Inherited from UBPable_LocalPlayerSubsystem. Please view relevant contents in the parent class.
-
-- Class defaults
-
-  Tick the relevant class default values and UBPable_TickableLocalPlayerSubsystem consistent, please to view
-
-- Interface
-
-  Some interfaces are Inherited from UBPable_LocalPlayerSubsystem. Please view relevant contents in the parent class.
-
-  Tick the relevant events and UBPable_TickableLocalPlayerSubsystem consistent, please to view
-
-- Function
-
-  Some functions are Inherited from UBPable_LocalPlayerSubsystem. Please view relevant contents in the parent class.
-
-  Tick the relevant function and UBPable_TickableLocalPlayerSubsystem consistent, please to view
-
-### BPable_TickableWorldSubsystem
-
-- Life Time
-
-  Inherited from UBPable_WorldSubsystem. Please view relevant contents in the parent class.
-
-- Class defaults
-
-  The default value of Tick related class is the same as BPable_TickableWorldSubsystem, please go to check
-
-- Interface
-
-  Some interfaces are Inherited from UBPable_WorldSubsystem. Please view relevant contents in the parent class.
-
-  Tick related events are consistent with BPable_TickableWorldSubsystem, please go to check
-
-- Function
-
-  Tick related functions are the same as BPable_TickableWorldSubsystem, please go to see

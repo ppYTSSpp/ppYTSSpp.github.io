@@ -2,7 +2,7 @@
 sort: 1
 ---
 
-# 可蓝图化的子系统v0.8
+# 可蓝图化的子系统v1.3
 
 ## 插件简介
 
@@ -22,7 +22,11 @@ BPable_TickableWorldSubsystem
 
 ![可蓝图继承的子系统](../resource/BPableSubsystem/屏幕截图 2022-09-02 171703.jpg)
 
-> 图中Get到的BPable子系统的这种用法**非法**，关于该插件的使用方法在下文。上图仅仅时展示作用
+> 图中Get到的BPable子系统的这种用法**非法**。因为图中的这几个Subsystem是插件提供的基类，任何情况下都不应该获取它。
+>
+> 当然，用图中的方式获取你的子系统蓝图类是可以的。
+>
+> 关于该插件的使用方法在下文。上图仅仅时展示作用
 
 用户直接通过蓝图继承这些基类就可以获得蓝图子系统。
 
@@ -54,7 +58,7 @@ BPable_TickableWorldSubsystem
 
 ## 蓝图子系统
 
-###  通用使用说明
+###  一般使用说明
 
 在蓝图类编辑窗口左侧我的蓝图中点击重载相应的函数
 
@@ -134,11 +138,53 @@ BPable_TickableWorldSubsystem
 
 ------
 
-### 可Tick的游戏实例子系统蓝图类
+## 通用功能
 
-- 生命周期
+### 有激活状态的子系统蓝图类
 
-  继承自UBPable_GameInstanceSubsystem，请在父类中查看相关内容
+- 功能概述
+
+  一个独立的激活状态，不对Subsystem本身产生实质影响，提供给用户的布尔状态
+
+- 适用基类
+
+  前缀是BPable的基类的子类
+
+- 类默认值
+
+  | 名称          | 解释           |
+  | ------------- | -------------- |
+  | ActiveDefault | 默认的激活状态 |
+
+- 函数
+
+  | 名称         | 图示                                                         | 解释                                                         |
+  | ------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | IsActive     | <img src="../resource/BPableSubsystem/屏幕截图 2022-11-17 205046.jpg" style="zoom: 67%;" /> | 获取激活状态值                                               |
+  | Activate     | <img src="../resource/BPableSubsystem/屏幕截图 2022-11-17 204817.jpg" style="zoom:67%;" /> | 激活，并广播激活<br />参数bReset为真时，即使已经是激活的，仍会再激活一次。 |
+  | Deactivate   | <img src="../resource/BPableSubsystem/屏幕截图 2022-11-17 204835.jpg" style="zoom:67%;" /> | 反激活                                                       |
+  | ToggleActive | <img src="../resource/BPableSubsystem/屏幕截图 2022-11-17 205036.jpg" style="zoom:67%;" /> | 切换激活                                                     |
+  | SetActive    | <img src="../resource/BPableSubsystem/屏幕截图 2022-11-17 205024.jpg" alt="屏幕截图 2022-11-17 205024" style="zoom:67%;" /> | 设置激活状态<br />参数NewActive是要设置的新的值。<br />参数Reset是否为重设激活 |
+
+- 委托
+
+  | 名称                      | 解释                                                         |
+  | ------------------------- | ------------------------------------------------------------ |
+  | OnActivated(Object,Reset) | 激活后执行的委托<br />参数Object是分发委托的Subsystem的引用<br />参数Reset是激活时是否重设的激活 |
+  | OnDeactivated(Object)     | 反激活后执行的委托<br />参数Object是分发委托的Subsystem的引用 |
+
+
+---
+
+### 可Tick的子系统蓝图类
+
+- 功能概述
+
+  有该功能子系统蓝图类可以随着每帧执行Tick事件
+
+- 适用基类
+
+  前缀是BPable_Tickable的基类的子类
 
 - 类默认值
 
@@ -147,7 +193,7 @@ BPable_TickableWorldSubsystem
   | IsTickEnabled        | 是否启用Tick             |
   | IsTickableThenPaused | 是否在游戏暂停后启用Tick |
 
-- 接口
+- 事件
 
   部分接口继承自UBPable_GameInstanceSubsystem，请在父类中查看相关内容
 
@@ -157,8 +203,6 @@ BPable_TickableWorldSubsystem
 
 - 函数
 
-  部分函数继承自UBPable_GameInstanceSubsystem，请在父类中查看相关内容
-
   | 名称                          | 图示                                                         | 解释                         |
   | ----------------------------- | ------------------------------------------------------------ | ---------------------------- |
   | SetTickEnabled                | ![](../resource/BPableSubsystem/屏幕截图 2022-09-24 203609.jpg) | 设置是否启用Tick             |
@@ -166,46 +210,3 @@ BPable_TickableWorldSubsystem
   | SetTickableWhenPaused         | ![](../resource/BPableSubsystem/屏幕截图 2022-09-24 203630.jpg) | 设置是否当游戏暂停时Tick     |
   | IsSubsystemTickableWhenPaused | ![](../resource/BPableSubsystem/屏幕截图 2022-09-24 203639.jpg) | 返回是否在游戏暂停时Tick的值 |
 
-### 可Tick的本地玩家子系统蓝图类
-
-- 生命周期
-
-  继承自UBPable_LocalPlayerSubsystem，请在父类中查看相关内容
-
-- 类默认值
-
-  Tick相关的类默认值和UBPable_TickableLocalPlayerSubsystem保持一致，请前往查看
-
-- 接口
-
-  部分接口继承自UBPable_LocalPlayerSubsystem，请在父类中查看相关内容
-
-  Tick相关的事件和UBPable_TickableLocalPlayerSubsystem保持一致，请前往查看
-
-- 函数
-
-  部分函数继承自UBPable_LocalPlayerSubsystem，请在父类中查看相关内容
-
-  Tick相关的函数和UBPable_TickableLocalPlayerSubsystem保持一致，请前往查看
-
----
-
-### 可Tick的场景子系统蓝图类
-
-- 生命周期
-
-  继承自UBPable_WorldSubsystem，请在父类中查看相关内容
-
-- 类默认值
-
-  Tick相关的类默认值和UBPable_TickableGameInstanceSubsystem保持一致，请前往查看
-  
-- 接口
-
-  部分接口继承自UBPable_WorldSubsystem，请在父类中查看相关内容
-
-  Tick相关的事件和UBPable_TickableGameInstanceSubsystem保持一致，请前往查看
-  
-- 函数
-
-  Tick相关的函数和UBPable_TickableGameInstanceSubsystem保持一致，请前往查看
