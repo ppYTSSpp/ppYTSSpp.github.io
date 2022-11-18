@@ -186,6 +186,8 @@ Do not use a node whose World must be known in advance (such as GetActorOfClass 
 
   With this feature subsystem blueprint classes can execute Tick events with each frame
 
+  Tick events receive the effect of the activation status. Even if Tick is currently available, if it is not activated, the Tick event is not executed.
+
 - Applicable Base Classes
 
   Subclasses of a base class whose class name is prefixed with "BPable_Tickable"

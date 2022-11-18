@@ -180,7 +180,9 @@ BPable_TickableWorldSubsystem
 
 - 功能概述
 
-  有该功能子系统蓝图类可以随着每帧执行Tick事件
+  有该功能子系统蓝图类可以随着每帧执行Tick事件。
+
+  Tick事件会收到激活状态的影响。即使当前可以Tick，若未激活，则不执行Tick事件。
 
 - 适用基类
 
