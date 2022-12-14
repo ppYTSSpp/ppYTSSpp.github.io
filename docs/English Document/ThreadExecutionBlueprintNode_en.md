@@ -2,7 +2,11 @@
 sort: 2
 ---
 
-# ThreadExecutionBlueprintNode
+# ThreadExecutionBlueprintNode v0.5
+
+## Node Directory
+
+![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-14 133356.jpg)
 
 ## ThreadExecOnce
 
@@ -90,7 +94,7 @@ Example.
 | TcikWhenPaused | Whether to execute Tick when the game is paused              |
 | Tick           | Pins executed at each tick                                   |
 | Completed      | Pin executed when Tick execution jumps out                   |
-| DeltaSecond    | Parameters for Tick pin execution. is the delta time of the current Tick |
+| DeltaSeconds   | Parameters for Tick pin execution. is the delta time of the current Tick |
 | TickHandle     | TickHandle is the handle to this tick. This handle allows you to control the execution of the tick |
 
 ### Helper Functions

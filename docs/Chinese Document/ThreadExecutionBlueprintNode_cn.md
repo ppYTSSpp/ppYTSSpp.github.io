@@ -2,7 +2,11 @@
 sort: 2
 ---
 
-# ThreadExecutionBlueprintNode
+# 线程执行蓝图节点 v0.5
+
+## 节点目录
+
+![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-14 133356.jpg)
 
 ## ThreadExecOnce
 
@@ -39,8 +43,7 @@ sort: 2
 
 ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162413.jpg)
 
-- This is a macro that wraps ThreadExecOnce. The basic function is the same as it. The difference is that when this has already been executed once and the thread task is running, executing the node again will be blocked so that no new thread task is created. It can only be executed again when the original thread task is completed.
-- 这个宏对ThreadExecOnce进行了封装。基本的功能和原本的一致。不同之处在于：当原本的线程任务正在执行时再一次执行了该节点并不会创建新的线程任务，而是直接无视，只有当原先的线程任务执行完成后此节点使用。
+- 这个宏对ThreadExecOnce进行了封装。基本的功能和原本的一致。不同之处在于：当原本的线程任务正在执行时再一次执行了该节点并不会创建新的线程任务，而是直接无视，只有当原先的线程任务执行完成后此节点可再次使用。
 
 ## ThreadExecLoop
 
@@ -48,14 +51,14 @@ sort: 2
 
 ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 153341.jpg)
 
-- This node is used to loop through other threads for execution. If you need loop execution, do not use the ThreadExecOnce node plus WhileLoop to achieve it. Doing so is not possible because the blueprint has a limit on the number of one-time node executions.
+- 该节点用于线程循环执行。当执行该节点后，该节点会创建一个线程，并执行一个循环任务。如果你需要线程循环执行，请不要通过ThreadExecOnce节点+WhileLoop节点实现。因为蓝图有一次最多执行次数限制，这么做会导致循环执行一定次数后被迫停止。所以请使用本节点。
 
-| Node Pins  | Description                                                  |
+| 节点引脚   | 描述                                                         |
 | ---------- | ------------------------------------------------------------ |
-| Interval   | The wait time between the previous loop and the next loop. This is used to prevent threads from blocking. No problems caused when this value is 0 have been found so far |
-| LoopBody   | The loop body that will be executed for each loop            |
-| Completed  | Pins that are executed after the loop body breaks            |
-| LoopHandle | LoopHandle is the handle to this loop. This handle allows you to control the execution of the loop |
+| Interval   | 每一次Loop之间的线程等待时间。这么做是为了防止线程阻塞，暂时没发现如果其值为0时产生的问题。 |
+| LoopBody   | 每一次Loop时执行的引脚                                       |
+| Completed  | 循环体被Break跳出后在游戏线程中执行的引脚                    |
+| LoopHandle | LoopHandle是这个线程循环的对象引用。用于通过该引用对该线程循环进行控制，如跳出循环 |
 
 ------
 
@@ -63,19 +66,19 @@ sort: 2
 
 ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 154710.jpg)
 
-- This function is used to break a loop. If the loop is executing, it will jump out of the loop before executing the next one
+- 这个节点用于打破线程循环。如果循环在执行中，将在下次循环执行前跳出。
 
-Example.
+例子：
 
 ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 154729.jpg)
 
-- In the example, the order of execution is as above. Number two will perform the rest of the tasks in the game thread. The created thread will loop to execute pin 3. The first loop in the figure then calls the function that break the loop and continues executing the rest of the node until the end. On the second execution of the loop body because it was broken, the loop is jumped out and Completed is executed.
+- 在该例中，执行顺序如上。二号引脚将会在创建线程任务后在游戏线程中执行。创建的线程将会循环执行引脚3。在第一个循环中执行了BreakLoop节点，这将使得目标循环（也就是该循环）在下一次循环执行前跳出。之后执行4号节点后面的函数。执行完全后，进入第二次循环。因为已经被打断，所以跳出并在游戏线程中执行5号引脚。
 
 ### 蓝图宏
 
 ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162422.jpg)
 
-- This is a macro that wraps ThreadExecLoop. The purpose of its wrapping is the same as ThreadExecOnce.
+- 这是一个对ThreadExecLoop包装的宏。包装的目的和Try Thread Exec Once相同。
 
 ## ThreadExecTick
 
@@ -83,40 +86,40 @@ Example.
 
 ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162203.jpg)
 
-- This node is used in other threads to execute once with each Tick of the game. This is a special kind of loop whose loop body is executed at each Tick. When the task ends early it does not go directly to the next loop, but waits for the next Tick to initiate execution.
+- 该节点用于在其他线程中当每一Tick开始时执行一次。这是一种特殊的循环，它只会在每一Tick执行一次。当当前的Tick任务提前完成时，且尚未进入下一个Tick，则该线程会等待。直到进入下一个Tick后再执行一次Tick引脚
 
-| Node Pins      | Description                                                  |
+| 节点引脚       | 描述                                                         |
 | -------------- | ------------------------------------------------------------ |
-| TickEnabled    | The value of TickEnabled at the beginning of the Tick thread. If it is true, the Tick is executed immediately after the node; if it is false, the Tick is not executed until the end or the value of its TickEnabled is true. |
-| TcikWhenPaused | Whether to execute Tick when the game is paused              |
-| Tick           | Pins executed at each tick                                   |
-| Completed      | Pin executed when Tick execution jumps out                   |
-| DeltaSecond    | Parameters for Tick pin execution. is the delta time of the current Tick |
-| TickHandle     | TickHandle is the handle to this tick. This handle allows you to control the execution of the tick |
+| TickEnabled    | 是否默认执行Tick，如果为true，创建线程后执行Tick。如果为false，则创建线程后不会执行Tick，直到该值为真。 |
+| TcikWhenPaused | 是否在游戏暂停时执行Tick                                     |
+| Tick           | 每一Tick执行的引脚                                           |
+| Completed      | Tick跳出时执行的引脚                                         |
+| DeltaSeconds   | Tick引脚附带的参数。表示当前Tick的变化时间。                 |
+| TickHandle     | TickHandle是这个线程Tick的对象引用。用于对该线程Tick进行控制。 |
 
 ### 辅助函数
 
-| Name                  | Graph                                                        | Description                                                  |
+| 名称                  | 图示                                                         | 描述                                                         |
 | --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| BreakNextTick         | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162222.jpg) | Break the execution of the next Tick and jump out            |
-| IsTickable            | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162232.jpg) | Get the Tickable value of a Tick thread                      |
-| SetTickable           | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162243.jpg) | Sets the Tickable value of a Tick thread. If set to true, the Tick is executed. if set to false, the Tick is not executed and does not jump out. Can be reset to true in the future to continue executing Tick |
-| IsTickableWhenPaused  | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162253.jpg) | Get the TickableWhenPaused value of a Tick thread            |
-| SetTickableWhenPaused | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162302.jpg) | Set the value of whether the Tick can be executed when the game is paused |
+| BreakNextTick         | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162222.jpg) | 打断下一次Tick并跳出。                                       |
+| IsTickable            | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162232.jpg) | 获取线程Tick的可否Tick值。                                   |
+| SetTickable           | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162243.jpg) | 设置线程Tick可否Tick值。设置为真后将使其能执行Tick。设置为假后将使其不能被Tick。该值的真假并不影响该线程Tick的生命周期。 |
+| IsTickableWhenPaused  | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162253.jpg) | 获取线程Tick的可否在游戏暂停时Tick的值。                     |
+| SetTickableWhenPaused | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162302.jpg) | 设置线程Tick的可否在游戏暂停时Tick的值。                     |
 
 ### 蓝图宏
 
 ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162431.jpg)
 
-- This is a macro that wraps ThreadExecTick. The purpose of its wrapping is the same as ThreadExecOnce.
+- 这是一个对ThreadExecTick包装的宏. 包装的目的和Try Thread Exec Once相同。
 
 ## 工具
 
-| Name                 | Graph                                                        | Description                                                  |
+| 名称                 | 图示                                                         | 描述                                                         |
 | -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| GetCurrentThreadID   | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162326.jpg) | Get the thread ID of the thread executing the node           |
-| GetCurrentThreadName | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162333.jpg) | Get the name of the thread executing the node                |
-| IsGameThread         | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162343.jpg) | Gets the value of whether the thread executing the node is a game thread |
-| IsGameThread         | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162350.jpg) | A branching option. The condition is whether the thread executing the node is a game thread |
-| ThreadWait           | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162400.jpg) | Thread waiting. Can only be used for non-game threads. Used to wait for a certain amount of time in other threads. If the node is executed in the game thread it will not make the game thread wait. |
+| GetCurrentThreadID   | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162326.jpg) | 获取执行该节点的线程ID                                       |
+| GetCurrentThreadName | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162333.jpg) | 获取执行该节点的线程名称                                     |
+| IsGameThread         | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162343.jpg) | 获取执行该节点的线程是否为游戏线程                           |
+| IsGameThread         | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162350.jpg) | 一个分支选项。条件是执行该节点的线程是否是游戏线程。         |
+| ThreadWait           | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162400.jpg) | 线程等待，只能用于非游戏线程。一般用于让线程停止运行等待一定时间后再运行。如果该节点被执行于游戏线程中，将不会产生任何效果，会直接跳过。 |
 
