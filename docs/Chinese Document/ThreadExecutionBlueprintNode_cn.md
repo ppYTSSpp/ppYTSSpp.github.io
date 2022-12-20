@@ -4,6 +4,26 @@ sort: 2
 
 # 线程执行蓝图节点 v0.5
 
+## 插件简介
+
+多线程编程用于执行那些导致主线程（即游戏线程）阻塞的计算任务，将这些任务放到其他线程中执行并不会阻塞主线程。从而解决了在游戏中计算高负载任务导致的阻塞问题。
+
+本插件提供了多个蓝图节点用于快速的创建并执行多线程任务，使用简单，性能消耗小。
+
+## 快速使用
+
+在事件图表中右键搜索Thread关键字找到该分类
+
+![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-14 133356.jpg)
+
+选择其中的Try Thread Exec Once节点。
+
+简单的使用案例如下。除了Try Thread Exec Once节点的节点都是演示用的节点，并不是本插件含有的节点。MainProcess1为前处理，MainProcess2为执行了该节点之后的后处理。DoAlgorithm即其他线程中执行的任务。CallBack是Loop跳出后执行的回调任务。
+
+![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-20 140753.jpg)
+
+
+
 ## 节点目录
 
 ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-14 133356.jpg)

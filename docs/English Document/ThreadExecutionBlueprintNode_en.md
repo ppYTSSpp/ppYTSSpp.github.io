@@ -4,6 +4,24 @@ sort: 2
 
 # ThreadExecutionBlueprintNode v0.5
 
+## Plugin Introduction
+
+Multi-threaded programming is used to perform computational tasks that cause the main thread (i.e., the game thread) to block, and placing these tasks in other threads does not block the main thread. This solves the problem of blocking caused by computationally loaded tasks in the game.
+
+This plugin provides multiple blueprint nodes to quickly create and execute multi-threaded tasks with ease of use and low performance consumption.
+
+## Quick Use
+
+Find the category by right-clicking the Thread keyword in the Event Graph
+
+![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-14 133356.jpg)
+
+Select one of the Try Thread Exec Once nodes.
+
+A simple use case is as follows. MainProcess1 is the pre-process, MainProcess2 is the post-process after the execution of the node. DoAlgorithm is the task executed in other threads. CallBack is the callback task executed after the Loop jumped out.
+
+![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-20 140753.jpg)
+
 ## Node Directory
 
 ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-14 133356.jpg)
