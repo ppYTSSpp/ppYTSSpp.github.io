@@ -2,7 +2,7 @@
 sort: 2
 ---
 
-# ThreadExecutionBlueprintNode v0.5
+# ThreadExecutionBlueprintNode v0.7
 
 ## Plugin Introduction
 
@@ -133,6 +133,8 @@ Example.
 
 ## Utility
 
+### Utilities
+
 | Name                 | Graph                                                        | Description                                                  |
 | -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | GetCurrentThreadID   | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162326.jpg) | Get the thread ID of the thread executing the node           |
@@ -141,3 +143,19 @@ Example.
 | IsGameThread         | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162350.jpg) | A branching option. The condition is whether the thread executing the node is a game thread |
 | ThreadWait           | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162400.jpg) | Thread waiting. Can only be used for non-game threads. Used to wait for a certain amount of time in other threads. If the node is executed in the game thread it will not make the game thread wait. |
 
+------
+
+### Subsystem
+
+![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 143201.jpg)
+
+This subsystem is designed to provide global information about thread nodes, and the current version only provides the ability to get all thread nodes.
+
+- Callable functions
+
+| Name                      | Graph                                                        | Description                                                  |
+| ------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Get All Thread Exec Nodes | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152201.jpg)c | Gets all thread execution nodes, returning an array with elements of type ThreadAsyncExecBase reference. The current version of this type of reference has few functions that can be called. |
+| Get All Thread Exec Onces | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152217.jpg) | Gets all thread execution once nodes, returning an array with elements of type ThreadAsyncExecOnce reference. |
+| Get All Thread Exec Loops | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152227.jpg) | Gets all threads executing a node once, returning an array with elements of type ThreadAsyncExecLoop reference. |
+| Get All Thread Exec Ticks | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152237.jpg) | Gets all thread execution once nodes, returning an array with elements of type ThreadAsyncExecTick reference. |

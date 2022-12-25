@@ -2,7 +2,7 @@
 sort: 2
 ---
 
-# 线程执行蓝图节点 v0.5
+# 线程执行蓝图节点 v0.7
 
 ## 插件简介
 
@@ -135,6 +135,8 @@ sort: 2
 
 ## 工具
 
+### 工具集
+
 | 名称                 | 图示                                                         | 描述                                                         |
 | -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | GetCurrentThreadID   | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162326.jpg) | 获取执行该节点的线程ID                                       |
@@ -142,4 +144,21 @@ sort: 2
 | IsGameThread         | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162343.jpg) | 获取执行该节点的线程是否为游戏线程                           |
 | IsGameThread         | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162350.jpg) | 一个分支选项。条件是执行该节点的线程是否是游戏线程。         |
 | ThreadWait           | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162400.jpg) | 线程等待，只能用于非游戏线程。一般用于让线程停止运行等待一定时间后再运行。如果该节点被执行于游戏线程中，将不会产生任何效果，会直接跳过。 |
+
+------
+
+### 子系统
+
+![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 143201.jpg)
+
+该子系统旨在提供线程节点的全局信息，现版本仅提供获取所有的线程节点的功能。
+
+- 可调用的函数
+
+| 名称                      | 图示                                                         | 描述                                                         |
+| ------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Get All Thread Exec Nodes | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152201.jpg) | 获取所有的线程执行节点，返回一个元素类型为ThreadAsyncExecBase引用的数组。目前版本该类型的引用没有什么可以调用的函数。 |
+| Get All Thread Exec Onces | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152217.jpg) | 获取所有的线程执行一次节点，返回一个元素类型为ThreadAsyncExecOnce引用的数组。 |
+| Get All Thread Exec Loops | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152227.jpg) | 获取所有的线程执行一次节点，返回一个元素类型为ThreadAsyncExecLoop引用的数组。 |
+| Get All Thread Exec Ticks | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152237.jpg) | 获取所有的线程执行一次节点，返回一个元素类型为ThreadAsyncExecTick引用的数组。 |
 
