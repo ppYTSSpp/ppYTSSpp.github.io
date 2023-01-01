@@ -2,7 +2,12 @@
 sort: 2
 ---
 
-# ThreadExecutionBlueprintNode v0.7
+# ThreadExecutionBlueprintNode v0.8 pre
+
+- The 0.8 preview release is only intended as a preparation release for new features, with changes such as
+  - Fixes for some bugs in version 0.7.
+  - New features have been added, but these features are not stable for now. Only what is shown in this document is available. If you use features that are not included in the documentation, this plugin does not currently provide all support. Until a stable version 0.8 is released.
+  - Rename old nodes. Please check your blueprints and make replacements.
 
 ## Plugin Introduction
 
