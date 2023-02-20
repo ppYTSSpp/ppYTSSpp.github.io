@@ -2,7 +2,7 @@
 sort: 1
 ---
 
-# BlueprintableSubsystem v1.3
+# BlueprintableSubsystem v1.4
 
 - Partially translated by lpl
 
@@ -47,6 +47,10 @@ Users can obtain the blueprint subsystem by inheriting these base classes direct
 - Create the blueprint class in the Content browser and select BPable_GameInstanceSubsystem as the parent class
 
   ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103359.jpg)
+
+- Or you can quickly create subsystems in the content browser by right-clicking > Blueprints > Subsystems
+
+  ![](../resource/BPableSubsystem/屏幕截图 2023-02-20 174944.jpg)
 
 - Then open the blueprint class of the GameInstanceSubsystem you created and edit it
 
