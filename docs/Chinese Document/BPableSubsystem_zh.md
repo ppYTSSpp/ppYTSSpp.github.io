@@ -46,6 +46,10 @@ BPable_TickableWorldSubsystem
 
   ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 214111.jpg)
 
+- 或者你可以在内容浏览器中右键>蓝图>Subsystems中快速创建子系统
+
+  ![](../resource/BPableSubsystem/屏幕截图 2023-02-20 174944.jpg)
+
 - 创建成功后打开你创建的游戏实例子系统蓝图类进行编辑
 
   ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 220403.jpg)
