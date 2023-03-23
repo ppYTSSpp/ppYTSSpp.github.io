@@ -2,121 +2,121 @@
 sort: 3
 ---
 
-# 串口通信 v0.1
+# SerialPortCommunication v0.1
 
-## 插件简介
+## Plugin Introduction
 
-本插件期望提供一个符合虚幻C++编程环境下的串口编程所需要的API集，以及可以在蓝图中进行串口通信的函数集。
+This plugin expects to provide a set of APIs needed for serial programming in an Unreal C++ programming environment, as well as a set of functions that can be used for serial communication in blueprints.
 
-目前提供基本的串口通信，可以通过同步的方式（即阻塞游戏进程）或异步的方式（即不阻塞游戏线程）与串口通信。
+It currently provides basic serial communication, either synchronously (i.e. blocking the game process) or asynchronously (i.e. not blocking the game thread) with the serial port.
 
-这是作者第一次编写API封装相关的插件。如有不足，还请谅解。
+This is the author's first time to write API wrapper related plugins. Please understand if there are any shortcomings.
 
-如果你有很好的建议、改进需要以及在使用中遇到了意外错误，请发送反馈邮件到abc981140197@163.com
+If you have good suggestions, improvement needs and unexpected errors in use, please send feedback to abc981140197@163.com
 
-## 蓝图
+## Blueprints
 
-### 蓝图使用案例
+### Use cases in blueprints
 
-接下来的案例将展示简单的与一个串口进行收发。接入的串口设备是CH340，我将两个CH340对接来进行串口收发测试。
+The next case will show a simple send/receive with a serial port. The connected serial device is a CH340 and I docked two CH340s to perform a serial send/receive test.
 
 ![](../resource/SerialPortCommunication/屏幕截图 2023-03-22 151656.jpg)
 
-上图中，我创建了一个测试用Actor子类，并在BeginPlay之后进行创建串口。传入的两个结构体的值是其默认值。这里Name参数就是要打开的串口号。Synchronize默认勾选，其实勾选后也能进行异步操作，这里我保持默认值。
+In the above figure, I created a test Actor subclass and did the creation of the serial port after BeginPlay. The values of the two structures passed in are their default values. The Name parameter is the serial port number to be opened, Synchronize is checked by default, in fact, it can be checked for asynchronous operation, here I keep the default value.
 
-返回的结果是一个串口的句柄，在判断是否有效后将其保存为变量。
+The returned result is a handle to the serial port, which is saved as a variable after determining whether it is valid or not.
 
 ![屏幕截图 2023-03-22 151804](../resource/SerialPortCommunication/屏幕截图 2023-03-22 151804.jpg)
 
-创建串口的句柄后要进行初始设置。
+After creating the handle of the serial port, the initial settings should be made.
 
-上图中，进行的第一个函数是初始化串口并分配缓冲区。第二个函数设置其DeviceControlBlock，其值如下图所示，这是默认值。第三个函数设置其超时参数。传入的超时设置结构体的值为默认值。
+In the above figure, the first function performed is to initialize the serial port and allocate the buffer. The second function sets its DeviceControlBlock, whose value is shown below, which is the default value. The third function sets its timeout parameter. The value of the timeout setting structure passed in is the default value.
 
 ![屏幕截图 2023-03-22 151819](../resource/SerialPortCommunication/屏幕截图 2023-03-22 151819.jpg)
 
 ![屏幕截图 2023-03-22 151838](../resource/SerialPortCommunication/屏幕截图 2023-03-22 151838.jpg)
 
-在设置所有的必须项后，调用函数清空了该句柄的缓冲区。传入的PurgeAction为默认值
+After setting all mandatory items, the function is called to empty the buffer of this handle. The PurgeAction passed in is the default value
 
 ![屏幕截图 2023-03-22 151855](../resource/SerialPortCommunication/屏幕截图 2023-03-22 151855.jpg)
 
-**别忘了关闭串口！**这里为了简单测试，写在了该Actor的EndPlay时。
+**Don't forget to close the serial port! **Written here for simple testing at the EndPlay of this Actor.
 
 ![屏幕截图 2023-03-22 151943](../resource/SerialPortCommunication/屏幕截图 2023-03-22 151943.jpg)
 
-在句柄的有效周期内，可以调用AsyncWriteHandle来异步地写入串口的句柄
+AsyncWriteHandle can be called to write the serial port handle asynchronously during the valid period of the handle.
 
 ![屏幕截图 2023-03-22 151959](../resource/SerialPortCommunication/屏幕截图 2023-03-22 151959.jpg)
 
-在句柄的有效周期内，可以调用AsyncReadHandle来异步地写入串口的句柄
+AsyncReadHandle can be called to read the serial port handle asynchronously during the valid period of the handle
 
 ---
 
-### 蓝图API
+### Blueprints API
 
-#### 类型
+#### Types
 
 - Handle
 
-  句柄，对应Windows::HANDLE。其内部存有一个void指针。
+  Handle, corresponding to Windows::HANDLE, which holds a void pointer inside.
 
   ![](../resource/SerialPortCommunication/屏幕截图 2023-03-22 154738.jpg)
 
 - DesiredAccess
 
-  用于表示句柄串口的访问类型
+  Used to indicate the type of access to the handle serial port
 
   ![屏幕截图 2023-03-22 154757](../resource/SerialPortCommunication/屏幕截图 2023-03-22 154757.jpg)
 
 - ShareMode
 
-  用于表示句柄串口的共享模式，串口一般设置为Exclusive
+  Used to indicate the shared mode of the handle serial port, the serial port is generally set to Exclusive
 
   ![屏幕截图 2023-03-22 154811](../resource/SerialPortCommunication/屏幕截图 2023-03-22 154811.jpg)
 
 - DeviceControlBlock
 
-  设备控制块，对应windows api的_DCB结构体
+  Device control block, corresponding to the _DCB structure of the windows api
 
   ![屏幕截图 2023-03-22 154949](../resource/SerialPortCommunication/屏幕截图 2023-03-22 154949.jpg)
 
 - CommTimeouts
 
-  超时设置，对应windows api的_COMMTIMEOUTS结构体
+  Timeout setting, corresponding to the _COMMTIMEOUTS structure of the windows api
 
   ![屏幕截图 2023-03-22 160414](../resource/SerialPortCommunication/屏幕截图 2023-03-22 160414.jpg)
 
 - CommStat
 
-  串口状态
+  Serial port status
 
   ![屏幕截图 2023-03-22 172850](../resource/SerialPortCommunication/屏幕截图 2023-03-22 172850.jpg)
 
 - PurgeAction
 
-  缓冲器清除操作。
+  Buffer clear operation.
 
   ![屏幕截图 2023-03-22 160527](../resource/SerialPortCommunication/屏幕截图 2023-03-22 160527.jpg)
 
 - EventMask
 
-  串口事件遮罩
+  Serial port event masking
 
   ![屏幕截图 2023-03-22 160700](../resource/SerialPortCommunication/屏幕截图 2023-03-22 160700.jpg)
 
 - CommErrors
 
-  串口错误
+  Serial port error
 
   ![屏幕截图 2023-03-22 160717](../resource/SerialPortCommunication/屏幕截图 2023-03-22 160717.jpg)
 
 - Overlaped
 
-  重叠操作，一般用于句柄的异步执行。建议不使用，因为插件已提供异步执行版本。
+  Overlap operation, generally used for asynchronous execution of handles. It is not recommended to use it, as the plugin already provides an asynchronous execution version.
 
   ![屏幕截图 2023-03-22 160849](../resource/SerialPortCommunication/屏幕截图 2023-03-22 160849.jpg)
 
-#### 函数
+#### Functions
 
 ![屏幕截图 2023-03-23 151637](../resource/SerialPortCommunication/屏幕截图 2023-03-23 151637.jpg)
 
@@ -154,27 +154,27 @@ sort: 3
 
 ## CPP
 
-### CPP使用案例
+### Use cases in CPP
 
-首先，你需要在使用该插件的函数库的模组中添加依赖项。
+First, you need to add a dependency to the module of the function library that uses the plugin.
 
-如，在该例子中，我将在一个项目文件中测试串口通信。
+For example, in this example, I will test the serial communication in a project file.
 
-所以我先找到我的项目文件的.Build.cs文件，并在PublicDependencyModuleNames列表中添加"SerialPortCommunication"这样一个字段，这样我就能在项目代码中使用该模组的符号。
+Build.cs file of my project file and add a field "SerialPortCommunication" to the PublicDependencyModuleNames list so that I can use the module's symbols in my project code.
 
 ```c#
 PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" ,"SerialPortCommunication"});
 ```
 
-然后我创建了一个Actor的子类，用于测试串口通讯。
+Then I created a subclass of Actor for testing serial communication.
 
-创建成功后头文件添加
+After successful creation, add the following to the header file
 
 ```c++
 #include "WindowsCommProcessTypes.h"
 ```
 
-并在类内添加了三个函数的声明和一个句柄变量:
+and added three function declarations and a handle variable to the class.
 
 ```c++
 #pragma once
@@ -215,7 +215,7 @@ public:
 };
 ```
 
-然后我在cpp文件中去实现它:
+Then I implement it in the cpp file.
 
 ```c++
 #include "COMActorTest.h"
@@ -305,47 +305,47 @@ void ACOMActorTest::Print(FString String)
 
 ---
 
-#### 注意事项
+#### Cautions
 
-在代码文件中你可以找到两组关键文件，分别是
+In the code file you can find two sets of key files, which are
 
 ```
 WindowsCommProcessTypes.h
 WindowsCommProcess.h
 ```
 
-和
+and
 
 ```
 CommTypesForBlueprint.h
 CommFunctionLibrary.h
 ```
 
-其中，前一组文件是可以用于虚幻C++串口编程使用的文件，其中包含了封装的类型和函数。你应该使用前一组文件进行串口编程。
+The former set of files are the files that can be used for Unreal C++ serial programming use and contain the wrapped types and functions. You should use the former set of files for serial programming.
 
-后一组文件实现了将函数暴露给蓝图。后一组的类型和函数是对前一组的再次封装。
+The latter set of files implements the exposure of functions to the blueprint. The types and functions in the latter group are wrapped again in the former group.
 
-你在串口编程时应该以前一组文件的类型为准。
+The type of the previous set of files should prevail when you are programming the serial port.
 
-如果你需要进行拓展并想将拓展的C++函数暴露给蓝图，则暴露的部分应该参考后一组文件的实现。
-
-
-
-该部分展示的所有类型和函数将以前一组文件内的定义为准。
+If you need to make extensions and want to expose the extended C++ functions to the blueprint, the exposed section should refer to the implementation of the latter set of files.
 
 
 
-由于本插件大部分都是对Windows串口编程API的封装，所以这里就不对绝大部分函数或类型作出解释了。详情请查看Windows有关串口 函数的说明文档。
+All types and functions shown in this section will be subject to the definitions within the previous set of files.
+
+
+
+Since most of this plug-in is a wrapper for the Windows serial programming API, the vast majority of functions or types will not be explained here. Please see the Windows documentation on serial functions for details.
 
 ---
 
-#### 类型
+#### Types
 
 ```
 EDesiredAccessFlag
 ```
 
-串口访问标志，可以是多个值的组合。
+The serial access flag, which can be a combination of multiple values.
 
 
 
@@ -353,7 +353,7 @@ EDesiredAccessFlag
 EShareModeFlag
 ```
 
-串口共享模式标志，可以是多个值的组合。对于串口，一般为独占模式。
+The serial port shared mode flag, which can be a combination of multiple values. For serial ports, the mode is generally exclusive.
 
 
 
@@ -361,7 +361,7 @@ EShareModeFlag
 ECommErrorsFlag
 ```
 
-串口错误标志，可以是多个值的组合。
+The serial port error flag, which can be a combination of multiple values.
 
 
 
@@ -369,7 +369,7 @@ ECommErrorsFlag
 EEventMaskFlag
 ```
 
-串口事件标志，可以是多个值的组合。
+The serial event flag, which can be a combination of multiple values.
 
 
 
@@ -377,7 +377,7 @@ EEventMaskFlag
 EFlagsAndAttributesFlag
 ```
 
-串口属性描述，可以是多个值的组合。对于串口，一般只有Overlapped有用。
+Serial port property description, which can be a combination of multiple values. For serial ports, generally only Overlapped is useful.
 
 
 
@@ -385,7 +385,7 @@ EFlagsAndAttributesFlag
 EPurgeActionFlag
 ```
 
-串口缓冲区操作标志，可以是多个值的组合。
+The serial buffer operation flag, which can be a combination of multiple values.
 
 ---
 
@@ -393,7 +393,7 @@ EPurgeActionFlag
 ECreationDisposition
 ```
 
-创建操作枚举。对于串口，一般只有OpenExisting有用。
+Create an enumeration of operations. For serial ports, generally only OpenExisting is useful.
 
 
 
@@ -401,7 +401,7 @@ ECreationDisposition
 EDTRControl
 ```
 
-DTR流控制枚举。
+DTR flow control enumeration.
 
 
 
@@ -409,7 +409,7 @@ DTR流控制枚举。
 ERTSControl
 ```
 
-RTS流控制枚举。
+RTS flow control enumeration.
 
 
 
@@ -417,7 +417,7 @@ RTS流控制枚举。
 EParityMode
 ```
 
-校验模式枚举。
+Checksum mode enumeration.
 
 
 
@@ -425,7 +425,7 @@ EParityMode
 EStopBits
 ```
 
-停止位枚举
+Stop Bit Enumeration
 
 ---
 
@@ -433,9 +433,9 @@ EStopBits
 FHandle
 ```
 
-句柄结构。其内部是一个void指针，是Windows::HANDLE的封装，定义了有关操作。可以在蓝图中直接创建。
+Handle structure. Its interior is a void pointer, a wrapper around Windows::HANDLE, defining the operation in question. It can be created directly in the blueprint.
 
-可直接和Windows::HANDLE相互转换。
+It can be directly interconverted with Windows::HANDLE.
 
 | FHandle::          | 简介                                        |
 | ------------------ | ------------------------------------------- |
@@ -451,7 +451,7 @@ FHandle
 FSecurityAttributes
 ```
 
-安全属性。是_SECURITY_ATTRIBUTES的封装。可直接相互转换。
+Security attribute. Is an encapsulation of _SECURITY_ATTRIBUTES. Can be directly interconverted.
 
 
 
@@ -459,7 +459,7 @@ FSecurityAttributes
 FDeviceControlBlock
 ```
 
-设备控制块。是_DCB的封装。可直接相互转换。
+Device control block. Is a wrapper for _DCB. Can be directly converted to each other.
 
 
 
@@ -467,7 +467,7 @@ FDeviceControlBlock
 FOverlapped
 ```
 
-重叠操作结构。是_OVERLAPPED的封装。可直接相互转换。
+Overlap operation structure. Is an encapsulation of _OVERLAPPED. It can be directly converted to each other.
 
 
 
@@ -475,7 +475,7 @@ FOverlapped
 FCommTimeouts
 ```
 
-串口超市设置。是_COMMTIMEOUTS的封装。可直接相互转换。
+Serial supermarket settings. Is a wrapper for _COMMTIMEOUTS. It can be directly converted to each other.
 
 
 
@@ -483,56 +483,56 @@ FCommTimeouts
 FCommStat
 ```
 
-串口状态结构，是_COMSTAT的封装。可直接相互转换。
+Serial port state structure, a wrapper for _COMSTAT. It can be directly interconverted.
 
 ---
 
-#### 静态函数库
+#### Static function library
 
-| FWindowsCommProcess:: | 简介                                                         |
+| FWindowsCommProcess:: | Introduction                                                 |
 | --------------------- | ------------------------------------------------------------ |
-| CreateFileHandle()    | 创建文件句柄，一般不用于此进行串口句柄的创建。               |
-| CreateCommHandle()    | 创建串口句柄，这是对CreateFileHandle的封装。一般用此创建句柄和打开串口。 |
-| SetupComm()           | 初始化串口并分配缓冲区。                                     |
-| CloseHandle()         | 关闭句柄，用于关闭串口。                                     |
-| GetLastError()        | 获取最后的错误。                                             |
-| ClearCommError()      | 清除串口错误。                                               |
-| GetCommControlBlock() | 获取串口的控制块。                                           |
-| SetCommControlBlock() | 设置串口的控制块。                                           |
-| PurgeComm()           | 清除串口的缓冲区。                                           |
-| FlushCommBuffers()    | 刷新串口的缓冲区。                                           |
-| ReadHandle()          | 读句柄，用于读串口。                                         |
-| WriteHandle()         | 写句柄，用于写串口。                                         |
-| GetOverlappedResult() | 获取重叠操作的结果，一般用于获取异步操作的结果。             |
-| GetCommTimeouts()     | 获取串口的超时设置。                                         |
-| SetCommTimeouts()     | 设置串口的超时设置。                                         |
-| GetCommEventMask()    | 获取串口的事件遮罩。                                         |
-| SetCommEventMask()    | 设置串口的事件遮罩。                                         |
-| WaitCommEvent()       | 等待串口事件。                                               |
+| CreateFileHandle()    | Create a file handle, generally not used here for serial port handle creation. |
+| CreateCommHandle()    | Creates a serial port handle, which is a wrapper around CreateFileHandle. This is generally used to create the handle and open the serial port. |
+| SetupComm()           | Initialize the serial port and allocate buffers.             |
+| CloseHandle()         | Close handle to close the serial port.                       |
+| GetLastError()        | Get the last error.                                          |
+| ClearCommError()      | Clear the serial port error.                                 |
+| GetCommControlBlock() | Get the control block of the serial port.                    |
+| SetCommControlBlock() | Set the control block of the serial port.                    |
+| PurgeComm()           | Clears the buffer of the serial port.                        |
+| FlushCommBuffers()    | Flush the buffer of the serial port.                         |
+| ReadHandle()          | Read handle for reading the serial port.                     |
+| WriteHandle()         | Write handle for writing to the serial port.                 |
+| GetOverlappedResult() | Gets the result of an overlapping operation, typically used to get the result of an asynchronous operation. |
+| GetCommTimeouts()     | Get the timeout setting for the serial port.                 |
+| SetCommTimeouts()     | Set the timeout setting for the serial port.                 |
+| GetCommEventMask()    | Get the event mask of the serial port.                       |
+| SetCommEventMask()    | Set the event mask for the serial port.                      |
+| WaitCommEvent()       | Waiting for serial port events.                              |
 
 ---
 
-#### 异步操作类
+#### Asynchronous Operation Class
 
-| UAsyncReadHandleAction:: | 简介                                                         |
+| UAsyncReadHandleAction:: | Introduction                                                 |
 | ------------------------ | ------------------------------------------------------------ |
-| staitc AsyncReadHandle() | 工厂方法，用于创建一个UAsyncReadHandleAction对象。           |
-| Activate()               | 激活，激活后会执行异步操作。如果对象未执行过该函数，则异步操作不会被执行。异步操作完成后进行回调并销毁。 |
-| OnReadCompleted          | 读取完成后会执行的回调。                                     |
+| staitc AsyncReadHandle() | Factory method to create a UAsyncReadHandleAction object.    |
+| Activate()               | Activating. After activating, asynchronous operations are performed. If the object has not executed the function, the asynchronous operation will not be executed. After the asynchronous operation is complete, it is called back and destroyed. |
+| OnReadCompleted          | A callback that is executed when the read is complete.       |
 
 
 
-| UAsyncWriteHandleAction:: | 简介                                                         |
+| UAsyncWriteHandleAction:: | Introduction                                                 |
 | ------------------------- | ------------------------------------------------------------ |
-| static AsyncWriteHandle() | 工厂方法，用于创建一个UAsyncWriteHandleAction对象。          |
-| Activate()                | 激活，激活后会执行异步操作。如果对象未执行过该函数，则异步操作不会被执行。异步操作完成后进行回调并销毁。 |
-| OnWriteCompleted          | 写入完成后会执行的回调。                                     |
+| static AsyncWriteHandle() | Factory method to create a UAsyncWriteHandleAction object.   |
+| Activate()                | Activating. After activating, asynchronous operations are performed. If the object has not executed the function, the asynchronous operation will not be executed. After the asynchronous operation is complete, it is called back and destroyed. |
+| OnWriteCompleted          | A callback that is executed when a write is complete.        |
 
 
 
-| UAsyncWaitCommEvent::       | 简介                                                         |
+| UAsyncWaitCommEvent::       | Introduction                                                 |
 | --------------------------- | ------------------------------------------------------------ |
-| static AsyncWaitCommEvent() | 工厂方法，用于创建一个UAsyncWaitCommEvent对象。              |
-| Activate()                  | 激活，激活后会执行异步操作。如果对象未执行过该函数，则异步操作不会被执行。异步操作完成后进行回调并销毁。 |
-| OnWaitEventActivated        | 串口事件触发后会执行的回调。                                 |
+| static AsyncWaitCommEvent() | Factory method to create a UAsyncWaitCommEvent object.       |
+| Activate()                  | Activating. After activating, asynchronous operations are performed. If the object has not executed the function, the asynchronous operation will not be executed. After the asynchronous operation is complete, it is called back and destroyed. |
+| OnWaitEventActivated        | A callback that is executed after a serial port event is triggered. |
 
