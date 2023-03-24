@@ -122,33 +122,33 @@ AsyncReadHandle can be called to read the serial port handle asynchronously duri
 
 蓝图节点的解释将不在此处解释，在蓝图中这些节点的引脚部分有注释。
 
-| 函数名                   | 图表                                                         | 函数简述                                                     |
+| Function Name            | Graphic                                                      | Introduction                                                 |
 | ------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Convert Handle to String | ![](../resource/SerialPortCommunication/屏幕截图 2023-03-22 162443.jpg) | 将句柄转化为字符串。<br />其结果为Handle内部的void指针的地址值。 |
-| Handle Is Valid          | ![](../resource/SerialPortCommunication/屏幕截图 2023-03-22 162519.jpg) | 返回一个Handle是否有效。                                     |
-| Handle Is Valid          | ![](../resource/SerialPortCommunication/屏幕截图 2023-03-22 162511.jpg) | 为上述函数的执行分支版本。                                   |
-| Create Comm Handle       | ![屏幕截图 2023-03-22 163827](../resource/SerialPortCommunication/屏幕截图 2023-03-22 163827.jpg) | 创建串口的句柄。<br />Synchronize为真时，仍可进行异步操作。  |
-| Setup Comm               | ![屏幕截图 2023-03-22 163954](../resource/SerialPortCommunication/屏幕截图 2023-03-22 163954.jpg) | 初始化串口，并分配缓冲区。                                   |
-| Close Handle             | ![屏幕截图 2023-03-22 164106](../resource/SerialPortCommunication/屏幕截图 2023-03-22 164106.jpg) | 关闭句柄。                                                   |
-| Get Last Error Code      | ![屏幕截图 2023-03-22 164135](../resource/SerialPortCommunication/屏幕截图 2023-03-22 164135.jpg) | 获取最后的错误码，该函数最终是GetLastError()的包装。错误码又该函数返回，详情请网络搜索该函数的返回值代表的含义。 |
-| Clear Comm Error         | ![屏幕截图 2023-03-22 164936](../resource/SerialPortCommunication/屏幕截图 2023-03-22 164936.jpg) | 清除串口错误。并获取串口的错误和状态。                       |
-| Get Comm Control Block   | ![屏幕截图 2023-03-22 165053](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165053.jpg) | 获取串口的Device Control Block。                             |
-| Set Comm Control Block   | ![屏幕截图 2023-03-22 165103](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165103.jpg) | 设置串口的Device Control Block。                             |
-| Build Comm DCB           | ![屏幕截图 2023-03-22 165137](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165137.jpg) | 通过字符串构建串口DCB结构体。该函数为BuildCommDCB()的包装。具体的构建规则请网络搜索。 |
-| Convert String to DCB    | ![屏幕截图 2023-03-22 165146](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165146.jpg) | 该函数为上述函数的Convert版本                                |
-| Purge Comm               | ![屏幕截图 2023-03-22 165306](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165306.jpg) | 清空串口缓冲区。                                             |
-| Flush Comm Buffers       | ![屏幕截图 2023-03-22 165340](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165340.jpg) | 刷新串口的缓冲区                                             |
-| Read Handle              | ![屏幕截图 2023-03-22 165502](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165502.jpg) | 同步地读串口                                                 |
-| Async Read Handle        | ![屏幕截图 2023-03-22 165519](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165519.jpg) | 异步地读串口                                                 |
-| Write Handle             | ![屏幕截图 2023-03-22 165554](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165554.jpg) | 同步地写串口                                                 |
-| Async Write Handle       | ![屏幕截图 2023-03-22 165606](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165606.jpg) | 异步地写串口                                                 |
-| Get Overlapped Result    | ![屏幕截图 2023-03-22 165643](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165643.jpg) | 获取重叠操作的结果。该函数是GetOverlappedResult()的包装。一般用于等待获取异步操作的结果。bWait为真时阻塞线程。建议不使用该函数，应该使用Async版本的函数。如上面的Async Read Handle节点。 |
-| Get Comm Timeouts        | ![屏幕截图 2023-03-22 165716](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165716.jpg) | 获取串口的超时参数。                                         |
-| Set Comm Timeouts        | ![屏幕截图 2023-03-22 165727](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165727.jpg) | 设置串口的超时参数。                                         |
-| Get Comm Event Mask      | ![屏幕截图 2023-03-22 165830](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165830.jpg) | 获取串口的事件遮罩                                           |
-| Set Comm Event Mask      | ![屏幕截图 2023-03-22 165838](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165838.jpg) | 设置串口的事件遮罩                                           |
-| Wait Comm Event          | ![屏幕截图 2023-03-22 165848](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165848.jpg) | 等待串口事件响应，这是一个同步操作。一般情况下请使用异步操作。 |
-| Async Wait Comm Event    | ![屏幕截图 2023-03-22 165943](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165943.jpg) | 等待串口事件响应，这是一个异步操作。                         |
+| Convert Handle to String | ![](../resource/SerialPortCommunication/屏幕截图 2023-03-22 162443.jpg) | Converts a handle to a string. <br />The result is the address value of the void pointer inside the Handle. |
+| Handle Is Valid          | ![](../resource/SerialPortCommunication/屏幕截图 2023-03-22 162519.jpg) | Returns whether a Handle is valid or not.                    |
+| Handle Is Valid          | ![](../resource/SerialPortCommunication/屏幕截图 2023-03-22 162511.jpg) | It is the execution branch version of the above function.    |
+| Create Comm Handle       | ![屏幕截图 2023-03-22 163827](../resource/SerialPortCommunication/屏幕截图 2023-03-22 163827.jpg) | When Synchronize is true, asynchronous operation is still possible. |
+| Setup Comm               | ![屏幕截图 2023-03-22 163954](../resource/SerialPortCommunication/屏幕截图 2023-03-22 163954.jpg) | Initialize the serial port and allocate buffers.             |
+| Close Handle             | ![屏幕截图 2023-03-22 164106](../resource/SerialPortCommunication/屏幕截图 2023-03-22 164106.jpg) | Close the handle.                                            |
+| Get Last Error Code      | ![屏幕截图 2023-03-22 164135](../resource/SerialPortCommunication/屏幕截图 2023-03-22 164135.jpg) | Get the last error code, this function is ultimately a wrapper for GetLastError(). <br />The error code is returned by this function, <br />please search the web for details of what the return value of this function represents. |
+| Clear Comm Error         | ![屏幕截图 2023-03-22 164936](../resource/SerialPortCommunication/屏幕截图 2023-03-22 164936.jpg) | Clear serial port errors. And get the error and status of the serial port. |
+| Get Comm Control Block   | ![屏幕截图 2023-03-22 165053](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165053.jpg) | Get the Device Control Block of the serial port.             |
+| Set Comm Control Block   | ![屏幕截图 2023-03-22 165103](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165103.jpg) | Set the Device Control Block of the serial port.             |
+| Build Comm DCB           | ![屏幕截图 2023-03-22 165137](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165137.jpg) | Constructs a serial DCB structure from a string. <br />This function is a wrapper for BuildCommDCB().<br /> Please search the web for the specific build rules. |
+| Convert String to DCB    | ![屏幕截图 2023-03-22 165146](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165146.jpg) | This function is the Convert version of the above function   |
+| Purge Comm               | ![屏幕截图 2023-03-22 165306](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165306.jpg) | Clear the serial port buffer.                                |
+| Flush Comm Buffers       | ![屏幕截图 2023-03-22 165340](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165340.jpg) | Flushing the serial port buffer                              |
+| Read Handle              | ![屏幕截图 2023-03-22 165502](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165502.jpg) | Read serial port synchronously                               |
+| Async Read Handle        | ![屏幕截图 2023-03-22 165519](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165519.jpg) | Read serial port asynchronously                              |
+| Write Handle             | ![屏幕截图 2023-03-22 165554](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165554.jpg) | Write serial port synchronously                              |
+| Async Write Handle       | ![屏幕截图 2023-03-22 165606](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165606.jpg) | Write serial port asynchronously                             |
+| Get Overlapped Result    | ![屏幕截图 2023-03-22 165643](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165643.jpg) | Gets the result of the overlapped operation. <br />This function is a wrapper around GetOverlappedResult(). <br />It is generally used to wait for the result of an asynchronous operation to be obtained. <br />bWait blocks the thread when it is true. It is recommended not to use this function, <br />but to use the Async version of the function. Such as the Async Read Handle node above. |
+| Get Comm Timeouts        | ![屏幕截图 2023-03-22 165716](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165716.jpg) | Get the timeout parameter of the serial port.                |
+| Set Comm Timeouts        | ![屏幕截图 2023-03-22 165727](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165727.jpg) | Set the timeout parameter of the serial port.                |
+| Get Comm Event Mask      | ![屏幕截图 2023-03-22 165830](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165830.jpg) | Get the event mask of the serial port.                       |
+| Set Comm Event Mask      | ![屏幕截图 2023-03-22 165838](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165838.jpg) | Setting event masks for serial ports.                        |
+| Wait Comm Event          | ![屏幕截图 2023-03-22 165848](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165848.jpg) | Wait for the serial port event response, which is a synchronous operation. <br />Please use asynchronous operation in general. |
+| Async Wait Comm Event    | ![屏幕截图 2023-03-22 165943](../resource/SerialPortCommunication/屏幕截图 2023-03-22 165943.jpg) | Wait for the serial event response, which is an asynchronous operation. |
 
 
 
