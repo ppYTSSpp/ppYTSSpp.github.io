@@ -2,12 +2,11 @@
 sort: 2
 ---
 
-# ThreadExecutionBlueprintNode v0.8 pre
+# ThreadExecutionBlueprintNode v0.9
 
-- The 0.8 preview release is only intended as a preparation release for new features, with changes such as
-  - Fixes for some bugs in version 0.7.
-  - New features have been added, but these features are not stable for now. Only what is shown in this document is available. If you use features that are not included in the documentation, this plugin does not currently provide all support. Until a stable version 0.8 is released.
-  - Rename old nodes. Please check your blueprints and make replacements.
+- Changes in version 0.9 compared to version 0.8:
+  - Temporarily deprecate Thread Exec Loop-related nodes
+  - Improved the stability of asynchronous execution nodes. The execution timing of all asynchronous nodes is now aligned with the Tick gap of Actor. That is, asynchronous execution is not executed at times other than Actor's Tick. This ensures that there are generally no errors when executing Actor-related operations through the asynchronous execution node (note: errors may still occur when executing other parts of the function, but stability has been improved)
 
 ## Plugin Introduction
 
@@ -68,7 +67,7 @@ A simple use case is as follows. MainProcess1 is the pre-process, MainProcess2 i
 
 - This is a macro that wraps ThreadExecOnce. The basic function is the same as it. The difference is that when this has already been executed once and the thread task is running, executing the node again will be blocked so that no new thread task is created. It can only be executed again when the original thread task is completed.
 
-## ThreadExecLoop
+## ThreadExecLoop(Deprecated in v0.9)
 
 ### Main Nodes
 
@@ -111,24 +110,24 @@ Example.
 
 - This node is used in other threads to execute once with each Tick of the game. This is a special kind of loop whose loop body is executed at each Tick. When the task ends early it does not go directly to the next loop, but waits for the next Tick to initiate execution.
 
-| Node Pins      | Description                                                  |
-| -------------- | ------------------------------------------------------------ |
-| TickEnabled    | The value of TickEnabled at the beginning of the Tick thread. If it is true, the Tick is executed immediately after the node; if it is false, the Tick is not executed until the end or the value of its TickEnabled is true. |
-| TcikWhenPaused | Whether to execute Tick when the game is paused              |
-| Tick           | Pins executed at each tick                                   |
-| Completed      | Pin executed when Tick execution jumps out                   |
-| DeltaSeconds   | Parameters for Tick pin execution. is the delta time of the current Tick |
-| TickHandle     | TickHandle is the handle to this tick. This handle allows you to control the execution of the tick |
+| Node Pins                          | Description                                                  |
+| ---------------------------------- | ------------------------------------------------------------ |
+| TickEnabled(Deprecated in v0.9)    | The value of TickEnabled at the beginning of the Tick thread. If it is true, the Tick is executed immediately after the node; if it is false, the Tick is not executed until the end or the value of its TickEnabled is true. |
+| TcikWhenPaused(Deprecated in v0.9) | Whether to execute Tick when the game is paused              |
+| Tick                               | Pins executed at each tick                                   |
+| Completed                          | Pin executed when Tick execution jumps out                   |
+| DeltaSeconds                       | Parameters for Tick pin execution. is the delta time of the current Tick |
+| TickHandle                         | TickHandle is the handle to this tick. This handle allows you to control the execution of the tick |
 
 ### Helper Functions
 
-| Name                  | Graph                                                        | Description                                                  |
-| --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| BreakNextTick         | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162222.jpg) | Break the execution of the next Tick and jump out            |
-| IsTickable            | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162232.jpg) | Get the Tickable value of a Tick thread                      |
-| SetTickable           | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162243.jpg) | Sets the Tickable value of a Tick thread. If set to true, the Tick is executed. if set to false, the Tick is not executed and does not jump out. Can be reset to true in the future to continue executing Tick |
-| IsTickableWhenPaused  | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162253.jpg) | Get the TickableWhenPaused value of a Tick thread            |
-| SetTickableWhenPaused | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162302.jpg) | Set the value of whether the Tick can be executed when the game is paused |
+| Name                                      | Graph                                                        | Description                                                  |
+| ----------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| BreakNextTick                             | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162222.jpg) | Break the execution of the next Tick and jump out            |
+| IsTickable(Deprecated in v0.9)            | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162232.jpg) | Get the Tickable value of a Tick thread                      |
+| SetTickable(Deprecated in v0.9)           | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162243.jpg) | Sets the Tickable value of a Tick thread. If set to true, the Tick is executed. if set to false, the Tick is not executed and does not jump out. Can be reset to true in the future to continue executing Tick |
+| IsTickableWhenPaused(Deprecated in v0.9)  | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162253.jpg) | Get the TickableWhenPaused value of a Tick thread            |
+| SetTickableWhenPaused(Deprecated in v0.9) | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162302.jpg) | Set the value of whether the Tick can be executed when the game is paused |
 
 ### Macros
 
@@ -140,13 +139,13 @@ Example.
 
 ### Utilities
 
-| Name                 | Graph                                                        | Description                                                  |
-| -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| GetCurrentThreadID   | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162326.jpg) | Get the thread ID of the thread executing the node           |
-| GetCurrentThreadName | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162333.jpg) | Get the name of the thread executing the node                |
-| IsGameThread         | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162343.jpg) | Gets the value of whether the thread executing the node is a game thread |
-| IsGameThread         | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162350.jpg) | A branching option. The condition is whether the thread executing the node is a game thread |
-| ThreadWait           | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162400.jpg) | Thread waiting. Can only be used for non-game threads. Used to wait for a certain amount of time in other threads. If the node is executed in the game thread it will not make the game thread wait. |
+| Name                           | Graph                                                        | Description                                                  |
+| ------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| GetCurrentThreadID             | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162326.jpg) | Get the thread ID of the thread executing the node           |
+| GetCurrentThreadName           | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162333.jpg) | Get the name of the thread executing the node                |
+| IsGameThread                   | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162343.jpg) | Gets the value of whether the thread executing the node is a game thread |
+| IsGameThread                   | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162350.jpg) | A branching option. The condition is whether the thread executing the node is a game thread |
+| ThreadWait(Deprecated in v0.9) | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162400.jpg) | Thread waiting. Can only be used for non-game threads. Used to wait for a certain amount of time in other threads. If the node is executed in the game thread it will not make the game thread wait. |
 
 ------
 
@@ -158,9 +157,9 @@ This subsystem is designed to provide global information about thread nodes, and
 
 - Callable functions
 
-| Name                      | Graph                                                        | Description                                                  |
-| ------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Get All Thread Exec Nodes | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152201.jpg)c | Gets all thread execution nodes, returning an array with elements of type ThreadAsyncExecBase reference. The current version of this type of reference has few functions that can be called. |
-| Get All Thread Exec Onces | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152217.jpg) | Gets all thread execution once nodes, returning an array with elements of type ThreadAsyncExecOnce reference. |
-| Get All Thread Exec Loops | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152227.jpg) | Gets all threads executing a node once, returning an array with elements of type ThreadAsyncExecLoop reference. |
-| Get All Thread Exec Ticks | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152237.jpg) | Gets all thread execution once nodes, returning an array with elements of type ThreadAsyncExecTick reference. |
+| Name                                          | Graph                                                        | Description                                                  |
+| --------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Get All Thread Exec Nodes                     | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152201.jpg)c | Gets all thread execution nodes, returning an array with elements of type ThreadAsyncExecBase reference. The current version of this type of reference has few functions that can be called. |
+| Get All Thread Exec Onces                     | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152217.jpg) | Gets all thread execution once nodes, returning an array with elements of type ThreadAsyncExecOnce reference. |
+| Get All Thread Exec Loops(Deprecated in v0.9) | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152227.jpg) | Gets all threads executing a node once, returning an array with elements of type ThreadAsyncExecLoop reference. |
+| Get All Thread Exec Ticks                     | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152237.jpg) | Gets all thread execution once nodes, returning an array with elements of type ThreadAsyncExecTick reference. |
