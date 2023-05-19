@@ -2,7 +2,7 @@
 sort: 1
 ---
 
-# 可蓝图化的子系统v1.4
+# 可蓝图化的子系统v1.5
 
 ## 插件简介
 
@@ -132,13 +132,21 @@ BPable_TickableWorldSubsystem
 
 - 接口
 
-  | 名称                  | 图示                                                         | 解释                                                         |
-  | --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-  | Initialize            | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221009.jpg) | 此子系统创建后调用的事件                                     |
-  | PostInitialize        | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 222639.jpg) | 此所有UWorldSubsystem调用Initialize后调用的事件              |
-  | WorldBeginPlay        | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 222658.jpg) | 此当World准备好开始Gameplay、Gamemode转换到正确状态前和调用所有的Actor的Beginplay前调用的事 |
-  | Deinitialize          | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221033.jpg) | 此子系统被GC标记销毁前调用的事件                             |
-  | ShouldCreateSubsystem | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221053.jpg) | 此子系统创建前调用的函数，用于判断是否要创建该子系统单例。  可以不实现，不实现该接口时默认为创建。<br>实现时，若返回值为false则不创建，若返回值为true则创建。请留意 |
+  | 名称                   | 图示                                                         | 解释                                                         |
+  | ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | Initialize             | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221009.jpg) | 此子系统创建后调用的事件                                     |
+  | PostInitialize         | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 222639.jpg) | 此所有UWorldSubsystem调用Initialize后调用的事件              |
+  | WorldBeginPlay         | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 222658.jpg) | 此当World准备好开始Gameplay、Gamemode转换到正确状态前和调用所有的Actor的Beginplay前调用的事 |
+  | Deinitialize           | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221033.jpg) | 此子系统被GC标记销毁前调用的事件                             |
+  | ShouldCreateSubsystem  | ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 221053.jpg) | 此子系统创建前调用的函数，用于判断是否要创建该子系统单例。  可以不实现，不实现该接口时默认为创建。<br>实现时，若返回值为false则不创建，若返回值为true则创建。请留意 |
+  | WorldComponentsUpdated | ![屏幕截图 2023-05-19 163425](../resource/BPableSubsystem/屏幕截图 2023-05-19 163425.jpg) | 在世界组件（如所有关卡组件）被更新后被调用。                 |
+  | UpdateStreamingState   | ![屏幕截图 2023-05-19 163403](../resource/BPableSubsystem/屏幕截图 2023-05-19 163403.jpg) | 更新子系统所需的流送关卡（由world的UpdateStreamingState函数调用）。 |
+
+- 函数
+
+| 名称            | 图示                                                         | 解释                     |
+| --------------- | ------------------------------------------------------------ | ------------------------ |
+| GetWorldSoftPtr | ![屏幕截图 2023-05-19 163434](../resource/BPableSubsystem/屏幕截图 2023-05-19 163434.jpg) | 获得世界子系统依赖的关卡 |
 
 ------
 

@@ -136,13 +136,21 @@ Do not use a node whose World must be known in advance (such as GetActorOfClass 
 
 - Events
 
-  | Name                  | Graphic                                                      | Explain                                                      |
-  | --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-  | Initialize            | ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103614.jpg) | A event called after this subsystem created                  |
-  | PostInitialize        | ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103855.jpg) | A event called after all UWorldSubsystem calls Initialize    |
-  | WorldBeginPlay        | ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103911.jpg) | A event called when world is ready to start gameplay before the game mode transitions to the correct state and call BeginPlay on all actors |
-  | Deinitialize          | ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103627.jpg) | A event called before this subsystem was destoryed           |
-  | ShouldCreateSubsystem | ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103638.jpg) | A function called before this subsystem created<br/> the Implementation of it is not necessary<br/>If implement this function,return true to create this subsystem,return false not to create this subsystem |
+  | Name                   | Graphic                                                      | Explain                                                      |
+  | ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | Initialize             | ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103614.jpg) | A event called after this subsystem created                  |
+  | PostInitialize         | ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103855.jpg) | A event called after all UWorldSubsystem calls Initialize    |
+  | WorldBeginPlay         | ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103911.jpg) | A event called when world is ready to start gameplay before the game mode transitions to the correct state and call BeginPlay on all actors |
+  | Deinitialize           | ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103627.jpg) | A event called before this subsystem was destoryed           |
+  | ShouldCreateSubsystem  | ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103638.jpg) | A function called before this subsystem created<br/> the Implementation of it is not necessary<br/>If implement this function,return true to create this subsystem,return false not to create this subsystem |
+  | WorldComponentsUpdated | ![屏幕截图 2023-05-19 163425](../resource/BPableSubsystem/屏幕截图 2023-05-19 163425.jpg) | Called after world components (e.g. line batcher and all level components) have been updated |
+  | UpdateStreamingState   | ![屏幕截图 2023-05-19 163403](../resource/BPableSubsystem/屏幕截图 2023-05-19 163403.jpg) | Updates sub-system required streaming levels (called by world's UpdateStreamingState function) |
+
+- Functions
+
+| Name            | Graphic                                                      | Explain                             |
+| --------------- | ------------------------------------------------------------ | ----------------------------------- |
+| GetWorldSoftPtr | ![屏幕截图 2023-05-19 163434](../resource/BPableSubsystem/屏幕截图 2023-05-19 163434.jpg) | Get world subsystem dependent level |
 
 ------
 
