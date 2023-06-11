@@ -2,13 +2,10 @@
 sort: 2
 ---
 
-# 线程执行蓝图节点 v0.9
+# 线程执行蓝图节点 v1.1
 
-- 版本0.9相比版本0.8的改动项：
-
-  - 暂时将Thread Exec Loop相关的节点置为废弃
-  
-  - 改进了异步执行节点的稳定性。目前所有的异步节点的执行时机和Actor的Tick间隙保持一致。即异步执行不会在Actor的Tick之外的时间执行。这保证了通过异步执行节点去执行有关Actor的操作时一般不会产生报错（注：在执行其他部分函数时仍可能产生报错，但稳定性已有提升）
+- 新增不安全的线程执行节点。用于满足特殊的线程操作，如纯数学计算。但我仍建议你仅使用安全的线程执行节点
+- 原本的安全的线程执行节点新增选项：更细粒度的执行节奏控制
 
 ## 插件简介
 
@@ -30,6 +27,18 @@ sort: 2
 
 
 
+## 前置知识
+
+![Exec0.drawio](../resource/ThreadExecutionBlueprintNode/Exec0.drawio.png)
+
+上图是一个Tick内执行的主要内容的简化图。执行顺序从上到下。第一层结构是主要tick，向下一级是Tick内部不同的Tick组。这些组将会串行执行。另外，这个主tick线是发生在游戏线程中的。
+
+上图为在一个tick内，有多个部分tick先后执行。其中有关游戏逻辑的部分大多放在了PrePhysics到PostUpdateWork之间。
+
+在各个Tick之间，有时UE也会进行垃圾回收（GC）。所以将重要的对游戏对象的操作放在除了允许计算游戏逻辑的tick组之外的地方执行往往会导致崩溃。
+
+以下节点将会提供安全的在其他线程中执行游戏逻辑，但是其实现的方式也是基于与主Tick同步的方式。
+
 ## 节点目录
 
 ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-14 133356.jpg)
@@ -38,21 +47,45 @@ sort: 2
 
 ### 主要节点
 
+#### CreateThreadExecOnce
+
 ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 145237.jpg)
 
 - 该节点用于创建一个线程并执行一次任务。
 - 可在任何地方使用。（下同）
 - 创建的线程的生命周期取决于线程的执行全过程和外部的Object。如果当线程处于执行状态时，外部的Object被销毁，则会导致线程立刻停止执行且Completed不会被执行。（下同）
 
-| 节点引脚     | 描述                                                         |
-| ------------ | ------------------------------------------------------------ |
-| 默认执行输入 | 执行该引脚后会创建线程并执行（下同）                         |
-| bLongTask    | 如果为真，则创建单独的线程。独立线程一般用于执行长任务。如果为假，则创建线程任务。其一般用于执行短任务。创建短任务线程时的性能消耗是最少的。（下同） |
-| 默认执行输出 | 创建线程后执行该引脚（下同）                                 |
-| Execution    | 线程创建后将执行一次该引脚                                   |
-| Completed    | Execution执行完成后，将会在游戏主线程中执行该引脚            |
+| 节点引脚          | 描述                                                         |
+| ----------------- | ------------------------------------------------------------ |
+| 默认执行输入      | 执行该引脚后会创建线程并执行（下同）                         |
+| bLongTask         | 如果为真，则创建单独的线程。独立线程一般用于执行长任务。如果为假，则创建线程任务。其一般用于执行短任务。创建短任务线程时的性能消耗是最少的。（下同） |
+| ExecuteWhenPaused | 当游戏暂停时是否仍然继续执行                                 |
+| ThreadName        | 自定义线程名称，如果未None，则为默认值                       |
+| BeginIn           | 线程执行在一个Tick中开始的时机                               |
+| EndBefore         | 线程执行在一个Tick中结束的时机                               |
+| 默认执行输出      | 创建线程后执行该引脚（下同）                                 |
+| Execution         | 线程创建后将执行一次该引脚                                   |
+| Completed         | Execution执行完成后，将会在游戏主线程中执行该引脚            |
+
+- 执行解释
+
+![Exec1.drawio](../resource/ThreadExecutionBlueprintNode/Exec1.drawio.png)
+
+上图为CreateThreadExecOnce的执行时机。
+
+你执行了该节点时，会先创建一个执行对象，但此时（LastTick）并不会立即执行任务。而是等待到下一次tick。到下一tick时（CurrentTick），会根据你在创建该线程任务时传入的参数（BeginIn、EndBefore）来控制任务的开始执行和确保结束。如图，根据传入的执行时机参数，我们在tick执行到PrePhysics时开始执行任务。于是在另一个线程里的任务就被触发开始执行了。
+
+等执行到PostUpdateWork时，因为我们的EndBefore传入的参数是PostUpdateWork。所以这里会询问线程任务：是否执行完毕。如果执行完毕，则询问操作立即结束，紧接着tick继续执行。如果执行为完毕，则会等待，直到线程任务执行完毕，再返回，然后tick继续执行。
+
+从上面可以看出有几个注意的点！
+
+- Once执行节点的任务执行部分不要委托过多的任务，否则可能会导致下一tick的任务等待被延长，从而导致下一tick卡顿。
+- BeginIn、EndBefore要谨慎选择。BeginIn是任务开始的时机，执行后线程任务会立即开始。EndBefore是等待线程执行结束。这两个的可选值可以选的很广，如BeginIn选PreActorTick，EndBefore选PostActorTick。但是注意！安全的执行时机一般在PrePhysics到PostUpdateWork之间。更广的执行时机只是插件提供的特殊选择。仅用于特别的需求。但是更广的执行时机并不能保证程序正常稳定地运行。如果这导致了你的程序的崩溃，请缩短执行时机。
+- 可以看出我们交给线程执行节点的任务会在另一个线程中被执行，但这并不一定能满足你的需求。原因是有些函数的执行会要求仅在游戏线程内执行，所以将这类节点交给线程节点去执行很可能会导致崩溃。这一次我不能做出任何的保证，因为这和被执行函数的编写者（或许是EpicGames）有关。
 
 ------
+
+#### CreateGameThreadExecOnce
 
 ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 150006.jpg)
 
@@ -65,91 +98,81 @@ sort: 2
 
 ------
 
-### 蓝图宏
-
-![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162413.jpg)
-
-- 这个宏对ThreadExecOnce进行了封装。基本的功能和原本的一致。不同之处在于：当原本的线程任务正在执行时再一次执行了该节点并不会创建新的线程任务，而是直接无视，只有当原先的线程任务执行完成后此节点可再次使用。
-
-## ThreadExecLoop(v0.9已废弃)
-
-### 主要节点
-
-![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 153341.jpg)
-
-- 该节点用于线程循环执行。当执行该节点后，该节点会创建一个线程，并执行一个循环任务。如果你需要线程循环执行，请不要通过ThreadExecOnce节点+WhileLoop节点实现。因为蓝图有一次最多执行次数限制，这么做会导致循环执行一定次数后被迫停止。所以请使用本节点。
-
-| 节点引脚   | 描述                                                         |
-| ---------- | ------------------------------------------------------------ |
-| Interval   | 每一次Loop之间的线程等待时间。这么做是为了防止线程阻塞，暂时没发现如果其值为0时产生的问题。 |
-| LoopBody   | 每一次Loop时执行的引脚                                       |
-| Completed  | 循环体被Break跳出后在游戏线程中执行的引脚                    |
-| LoopHandle | LoopHandle是这个线程循环的对象引用。用于通过该引用对该线程循环进行控制，如跳出循环 |
-
-------
-
-### 辅助函数
-
-![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 154710.jpg)
-
-- 这个节点用于打破线程循环。如果循环在执行中，将在下次循环执行前跳出。
-
-例子：
-
-![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 154729.jpg)
-
-- 在该例中，执行顺序如上。二号引脚将会在创建线程任务后在游戏线程中执行。创建的线程将会循环执行引脚3。在第一个循环中执行了BreakLoop节点，这将使得目标循环（也就是该循环）在下一次循环执行前跳出。之后执行4号节点后面的函数。执行完全后，进入第二次循环。因为已经被打断，所以跳出并在游戏线程中执行5号引脚。
-
-### 蓝图宏
-
-![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162422.jpg)
-
-- 这是一个对ThreadExecLoop包装的宏。包装的目的和Try Thread Exec Once相同。
-
 ## ThreadExecTick
 
 ### 主要节点
+
+#### CreateThreadExecTick
 
 ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162203.jpg)
 
 - 该节点用于在其他线程中当每一Tick开始时执行一次。这是一种特殊的循环，它只会在每一Tick执行一次。当当前的Tick任务提前完成时，且尚未进入下一个Tick，则该线程会等待。直到进入下一个Tick后再执行一次Tick引脚
 
-| 节点引脚                   | 描述                                                         |
-| -------------------------- | ------------------------------------------------------------ |
-| TickEnabled(v0.9已废弃)    | 是否默认执行Tick，如果为true，创建线程后执行Tick。如果为false，则创建线程后不会执行Tick，直到该值为真。 |
-| TcikWhenPaused(v0.9已废弃) | 是否在游戏暂停时执行Tick                                     |
-| Tick                       | 每一Tick执行的引脚                                           |
-| Completed                  | Tick跳出时执行的引脚                                         |
-| DeltaSeconds               | Tick引脚附带的参数。表示当前Tick的变化时间。                 |
-| TickHandle                 | TickHandle是这个线程Tick的对象引用。用于对该线程Tick进行控制。 |
+| 节点引脚       | 描述                                                         |
+| -------------- | ------------------------------------------------------------ |
+| TickEnabled    | 是否默认执行Tick，如果为true，创建线程后执行Tick。如果为false，则创建线程后不会执行Tick，直到该值为真。 |
+| TcikWhenPaused | 是否在游戏暂停时执行Tick                                     |
+| bLongTask      | 如果为真，则创建单独的线程。独立线程一般用于执行长任务。如果为假，则创建线程任务。其一般用于执行短任务。创建短任务线程时的性能消耗是最少的。（下同） |
+| ThreadName     | 自定义线程名称，如果未None，则为默认值                       |
+| BeginIn        | 线程执行在一个Tick中开始的时机                               |
+| EndBefore      | 线程执行在一个Tick中结束的时机                               |
+| Tick           | 每一Tick执行的引脚                                           |
+| Completed      | Tick跳出时执行的引脚                                         |
+| DeltaSeconds   | Tick引脚附带的参数。表示当前Tick的变化时间。                 |
+| TickHandle     | TickHandle是这个线程Tick的对象引用。用于对该线程Tick进行控制。 |
+
+- 执行解释
+
+执行时机其实和CreateThreadExecOnce差不多。只不过在执行完毕后会在下一tick继续重复操作。
 
 ### 辅助函数
 
-| 名称                              | 图示                                                         | 描述                                                         |
-| --------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| BreakNextTick                     | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162222.jpg) | 打断下一次Tick并跳出。                                       |
-| IsTickable(v0.9已废弃)            | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162232.jpg) | 获取线程Tick的可否Tick值。                                   |
-| SetTickable(v0.9已废弃)           | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162243.jpg) | 设置线程Tick可否Tick值。设置为真后将使其能执行Tick。设置为假后将使其不能被Tick。该值的真假并不影响该线程Tick的生命周期。 |
-| IsTickableWhenPaused(v0.9已废弃)  | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162253.jpg) | 获取线程Tick的可否在游戏暂停时Tick的值。                     |
-| SetTickableWhenPaused(v0.9已废弃) | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162302.jpg) | 设置线程Tick的可否在游戏暂停时Tick的值。                     |
+| 名称                  | 图示                                                         | 描述                                                         |
+| --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| BreakNextTick         | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162222.jpg) | 打断下一次Tick并跳出。                                       |
+| IsTicking             | ![屏幕截图 2023-06-11 153938](../resource/ThreadExecutionBlueprintNode/屏幕截图 2023-06-11 153938.jpg) | 是否正在执行任务                                             |
+| IsTickEnabled         | ![屏幕截图 2023-06-11 153923](../resource/ThreadExecutionBlueprintNode/屏幕截图 2023-06-11 153923.jpg) | 获取线程Tick的可否Tick值。                                   |
+| SetTickEnabled        | ![屏幕截图 2023-06-11 153905](../resource/ThreadExecutionBlueprintNode/屏幕截图 2023-06-11 153905.jpg) | 设置线程Tick可否Tick值。设置为真后将使其能执行Tick。设置为假后将使其不能被Tick。该值的真假并不影响该线程Tick的生命周期。 |
+| IsTickableWhenPaused  | ![屏幕截图 2023-06-11 153931](../resource/ThreadExecutionBlueprintNode/屏幕截图 2023-06-11 153931.jpg) | 获取线程Tick的可否在游戏暂停时Tick的值。                     |
+| SetTickableWhenPaused | ![屏幕截图 2023-06-11 153915](../resource/ThreadExecutionBlueprintNode/屏幕截图 2023-06-11 153915.jpg) | 设置线程Tick的可否在游戏暂停时Tick的值。                     |
 
 ### 蓝图宏
+
+#### ThreadExecTick
 
 ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162431.jpg)
 
 - 这是一个对ThreadExecTick包装的宏. 包装的目的和Try Thread Exec Once相同。
 
+## ThreadExecOnceUnsafely
+
+不安全地执行一次。这个节点开发不完善，且有很多问题。注意使用！
+
+它并没有上述的Once节点那样有跟游戏线程Tick同步的机制，所以他会无视掉这些直接强制执行线程任务。
+
+如果你将一些游戏逻辑放进去，很可能会导致崩溃。
+
+不建议使用。
+
+## ThreadExecLoopUnsafely
+
+同上，不建议使用。
+
+## ThreadExecTickUnsafely
+
+同上，不建议使用。
+
 ## 工具
 
 ### 工具集
 
-| 名称                   | 图示                                                         | 描述                                                         |
-| ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| GetCurrentThreadID     | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162326.jpg) | 获取执行该节点的线程ID                                       |
-| GetCurrentThreadName   | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162333.jpg) | 获取执行该节点的线程名称                                     |
-| IsGameThread           | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162343.jpg) | 获取执行该节点的线程是否为游戏线程                           |
-| IsGameThread           | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162350.jpg) | 一个分支选项。条件是执行该节点的线程是否是游戏线程。         |
-| ThreadWait(v0.9已废弃) | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162400.jpg) | 线程等待，只能用于非游戏线程。一般用于让线程停止运行等待一定时间后再运行。如果该节点被执行于游戏线程中，将不会产生任何效果，会直接跳过。 |
+| 名称                 | 图示                                                         | 描述                                                 |
+| -------------------- | ------------------------------------------------------------ | ---------------------------------------------------- |
+| GetCurrentThreadID   | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162326.jpg) | 获取执行该节点的线程ID                               |
+| GetCurrentThreadName | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162333.jpg) | 获取执行该节点的线程名称                             |
+| SetThreadName        | ![屏幕截图 2023-06-11 153948](../resource/ThreadExecutionBlueprintNode/屏幕截图 2023-06-11 153948.jpg) | 设置当前线程的名称                                   |
+| IsGameThread         | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162343.jpg) | 获取执行该节点的线程是否为游戏线程                   |
+| IsGameThread         | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-13 162350.jpg) | 一个分支选项。条件是执行该节点的线程是否是游戏线程。 |
 
 ------
 
@@ -161,10 +184,9 @@ sort: 2
 
 - 可调用的函数
 
-| 名称                                  | 图示                                                         | 描述                                                         |
-| ------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Get All Thread Exec Nodes             | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152201.jpg) | 获取所有的线程执行节点，返回一个元素类型为ThreadAsyncExecBase引用的数组。目前版本该类型的引用没有什么可以调用的函数。 |
-| Get All Thread Exec Onces             | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152217.jpg) | 获取所有的线程执行一次节点，返回一个元素类型为ThreadAsyncExecOnce引用的数组。 |
-| Get All Thread Exec Loops(v0.9已废弃) | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152227.jpg) | 获取所有的线程执行一次节点，返回一个元素类型为ThreadAsyncExecLoop引用的数组。 |
-| Get All Thread Exec Ticks             | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152237.jpg) | 获取所有的线程执行一次节点，返回一个元素类型为ThreadAsyncExecTick引用的数组。 |
+| 名称                      | 图示                                                         | 描述                                                         |
+| ------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Get All Thread Exec Nodes | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152201.jpg) | 获取所有的线程执行节点，返回一个元素类型为ThreadAsyncExecBase引用的数组。目前版本该类型的引用没有什么可以调用的函数。 |
+| Get All Thread Exec Onces | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152217.jpg) | 获取所有的线程执行一次节点，返回一个元素类型为ThreadAsyncExecOnce引用的数组。 |
+| Get All Thread Exec Ticks | ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2022-12-25 152237.jpg) | 获取所有的线程执行一次节点，返回一个元素类型为ThreadAsyncExecTick引用的数组。 |
 
