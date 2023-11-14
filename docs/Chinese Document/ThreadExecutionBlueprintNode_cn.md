@@ -72,7 +72,7 @@ sort: 2
 | bLongTask         | 如果为真，则创建单独的线程。独立线程一般用于执行长任务。如果为假，则创建线程任务。其一般用于执行短任务。创建短任务线程时的性能消耗是最少的。（下同） |
 | ExecuteWhenPaused | 当游戏暂停时是否仍然继续执行                                 |
 | ThreadName        | 自定义线程名称，如果未None，则为Pair默认值                   |
-| TimingPair        | 决定在一阵内执行时合适开始、合适结束的时机对                 |
+| TimingPair        | 决定在一帧内执行时合适开始、合适结束的时机对                 |
 | 默认执行输出      | 创建线程后执行该引脚（下同）                                 |
 | Execution         | 线程创建后将执行一次该引脚                                   |
 | Completed         | Execution执行完成后，将会在游戏主线程中执行该引脚            |
@@ -134,8 +134,6 @@ sort: 2
 | DeltaSeconds   | Tick引脚附带的参数。表示当前Tick的变化时间。                 |
 | TickHandle     | TickHandle是这个线程Tick的对象引用。用于对该线程Tick进行控制。 |
 
-
-
 - 执行解释
 
 执行时机其实和CreateThreadExecOnce差不多。只不过在执行完毕后会在下一tick继续重复操作。
@@ -187,7 +185,7 @@ sort: 2
 
 ![](../resource/ThreadExecutionBlueprintNode/屏幕截图 2023-11-09 192552.jpg)
 
-- 这是一个对CreateThreadExecTickForLoop包装的宏. 包装的目的和Thread Exec Once相同。
+- 这是一个对CreateThreadExecTickForLoop包装的宏. 包装的目的和CreateThreadExecOnce相同。
 
 ------
 
@@ -292,7 +290,7 @@ sort: 2
 
 | 成员名                  | 类型  | 解释                                                         |
 | ----------------------- | ----- | ------------------------------------------------------------ |
-| bDynamicExecPerTick     | bool  | 是否启用动态的每帧执行次数。如果启用，则每帧会执行复数次数，具体次数取决于可用耗时。会在线程Tick开始时持续重复执行，直到线程Tick结束时。 |
+| bDynamicExecPerTick     | bool  | 是否启用动态的每帧执行次数。如果启用，则每帧会执行多次，具体次数取决于可用耗时。会在线程Tick开始时持续重复执行，直到线程Tick结束时。 |
 | StaticExecTimes         | int32 | bDynamicExecPerTick为false时有效。静态执行时固定的每帧执行次数。 |
 | PredictNextUsingPreExec | bool  | bDynamicExecPerTick为true时有效。当执行一次时，是否要根据上次执行的耗时以及当前剩余可用耗时来预测是否要继续重复执行。 |
 | PredictedTimeCostFactor | float | bDynamicExecPerTick和PredictNextUsingPreExec均为true时有效。该值作为上次执行耗时的系数。值为1时，意味着将上次执行的时间作为参考，来预测剩余耗时是否能够允许再次一次。该值大于1时，将导致动态执行在一次tick内提前结束。该值小于1时，可能导致动态执行可能会稍微阻塞一下游戏线程，造成游戏线程闲置。 |
