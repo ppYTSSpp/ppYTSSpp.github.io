@@ -58,6 +58,8 @@ Users can obtain the blueprint subsystem by inheriting these base classes direct
 
 - Call the blueprint Subsystem you created using the Get Subsystem general node in other blueprint classes
 
+- (Note that if you create a subsystem and save it, but not in another blueprint and can't get a reference to the blueprint subsystem blueprint you created, restart the editor. After that you will be able to get the appropriate references)
+
   ![](../resource/BPableSubsystem/屏幕截图 2022-09-16 103525.jpg)
 
   ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 220633.jpg)

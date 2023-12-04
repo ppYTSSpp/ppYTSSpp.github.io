@@ -54,7 +54,7 @@ BPable_TickableWorldSubsystem
 
   ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 220403.jpg)
 
-- 在其他蓝图类中使用Get Subsystem通用节点调用你创建的蓝图子系统
+- 在其他蓝图类中使用Get Subsystem通用节点调用你创建的蓝图子系统（注意，如果你在创建子系统并保存后，没有在其他蓝图中并不能获取到你创建的蓝图子系统蓝图的引用，请重新启动编辑器。之后就可以获取到相应的引用了）
 
   ![](../resource/BPableSubsystem/屏幕截图 2022-09-02 220615.jpg)
 
